@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Capacity</title>
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload' %>
+    <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
+  </head>
+
+  <body>
+    <% if !(user = logged_in_user_helper).blank? then %>
+      Logged in as <%= user.name %><br/>
+    <% end %>
+
+    Cheat login
+    <%= form_tag  cheat_log_in_path, id: "cheat_login" do %>
+      <%= select_tag :user, options_for_select(options_for_select(User.all.order(:last_name, :first_name).map{|user| [user.name, user.id]}), "") , {:class=> "input", :onchange => "cheat_login.submit();", :include_blank => 'Please choose',  :style => "width:150px;"} %>
+    <% end %>
+    <%= button_to "Test", test_path %>
+    <%= yield %>
+  </body>
+</html>

@@ -1,0 +1,19 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>User:</strong>
+  <%= @capacitylog.user_id %>
+</p>
+
+<p>
+  <strong>Comment:</strong>
+  <%= @capacitylog.comment %>
+</p>
+
+<p>
+  <strong>Capacitycode:</strong>
+  <%= @capacitylog.capacitycode %>
+</p>
+
+<%= link_to 'Edit', edit_capacitylog_path(@capacitylog) %> |
+<%= link_to 'Back', capacitylogs_path %>

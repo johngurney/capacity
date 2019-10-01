@@ -1,0 +1,131 @@
+<script type="text/javascript">
+
+  function capacity_text(value) {
+    <% Capacitycode.all.each do |code| %>
+    if (value==<%= code.capacity_number.to_s%> ){
+      document.getElementById("details").innerHTML = "<%= code.text %>";
+      return true;
+
+    }
+    <% end %>
+  }
+
+  function set_absent(value) {
+    if (value == 1 ){
+      document.getElementById("return_date").style.display = "block";
+      } else {
+        document.getElementById("return_date").style.display = "none";
+      }
+      return true;
+    }
+
+
+</script>
+User home page
+<% user = logged_in_user_helper %>
+<% if Capacitylog.where(:user_id => user.id).count > 0 %>
+  <% log = Capacitylog.where(:user_id => user.id).order(:created_at).last %>
+  Current capacity <%= log.capacity_number.to_s %> logged at <%= log.created_at.strftime("%d %b %Y at %H:%M") %>
+<br/><br/>
+<% end %>
+
+<%= form_tag new_capacity_log_path(user), method: "post" do %>
+  <table width="80%" >
+    <col width="10%">
+    <col width="20%">
+    <col width="10%">
+    <col width="20%">
+    <col width="10%">
+    <col width="30%">
+    <tr>
+      <td>
+        Absent from office <% absent = (!log.blank? and log.absent) %>
+      </td>
+      <td>
+        <%= select_tag :absent, options_for_select([["Absent",1], ["Not absent",0]], (absent ? 1 : 0)), {:onchange => "set_absent(this.value);"} %>
+      </td>
+      <td colspan="4">
+        <div id="return_date" style="display: <%= absent ? "block" : "none" %>">
+          <%= date_field_tag :return_date, (absent) ? log.return_date.strftime("%Y-%m-%d") : Date.today %>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        Capacity
+      </td>
+      <td>
+        <%= select_tag :capacity_number, options_for_select(Capacitycode.all.order(:capacity_number).map { |code| [code.capacity_number]}, (log.blank? ? 0 : log.capacity_number)), {:id => "selector", :onchange => "capacity_text(this.value)"}  %>
+      </td>
+      <td>
+        Details
+      </td>
+      <td id="details" >
+        <% if !log.blank? %>
+          <%= Capacitycode.where(:capacity_number => log.capacity_number).first.text %>
+        <% end %>
+      </td>
+      <td>
+        Comments
+      </td>
+      <td>
+        <%= text_area_tag :text, "", size: "40x5" %>
+      </td>
+    </tr>
+  </table>
+  <%= submit_tag "Ok" %>
+<% end %>
+
+<h3>History</h3>
+
+<% if Capacitylog.where(:user_id => user.id).count > 0 %>
+  <table width="80%" >
+    <col width="20%">
+    <col width="25%">
+    <col width="20%">
+    <col width="35%">
+    <tr style="font-weight: bold">
+      <td>
+        Time / date
+      </td>
+      <td>
+        Capacity
+      </td>
+      <td>
+        Comments
+      </td>
+      <td>
+        Absent
+      </td>
+    </tr>
+
+    <% Capacitylog.where(:user_id => user.id).order(created_at: :desc).first(10).each do |log| %>
+    <tr>
+      <td>
+        <%= log.created_at.strftime("%H:%M on %d %b %Y") %>
+      </td>
+      <td>
+        <%= log.capacity_number %> - <%= Capacitycode.where(:capacity_number => log.capacity_number).first.text %>
+      </td>
+      <td>
+        <%= log.comment %>
+      </td>
+      <td>
+        <% if !log.blank? and log.absent and !log.return_date.blank? %>
+          Absent, returning <%= log.return_date.strftime("%H:%M on %d %b %Y") %>
+        <% else %>
+          Not absent
+        <% end %>
+      </td>
+    </tr>
+
+  <% end %>
+  </table>
+<% end %>
+
+<%= form_tag new_capacity_log_path(user), method: "post" do %>
+  <table>
+    <col width="50%">
+    <col width="50%">
+    <% Area.all.each do |area| %>
+    

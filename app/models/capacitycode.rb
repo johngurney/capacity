@@ -1,0 +1,2 @@
+class Capacitycode < ApplicationRecord
+end

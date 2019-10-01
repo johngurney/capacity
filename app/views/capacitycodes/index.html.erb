@@ -1,0 +1,29 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Capacitycodes</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Text</th>
+      <th>Number</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @capacitycodes.each do |capacitycode| %>
+      <tr>
+        <td><%= capacitycode.text %></td>
+        <td><%= capacitycode.number %></td>
+        <td><%= link_to 'Show', capacitycode %></td>
+        <td><%= link_to 'Edit', edit_capacitycode_path(capacitycode) %></td>
+        <td><%= link_to 'Destroy', capacitycode, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Capacitycode', new_capacitycode_path %>

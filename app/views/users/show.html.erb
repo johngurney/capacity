@@ -1,0 +1,31 @@
+<table width="50%">
+  <col width="30%">
+  <col width="70%">
+  <tr>
+    <td>First name</td>
+    <td><%= @user.first_name  %></td>
+  </tr>
+  <tr>
+    <td>Last name</td>
+    <td><%= @user.last_name  %></td>
+  </tr>
+  <tr>
+    <td>User type</td>
+    <td><%= @user.user_type %></td>
+  <tr>
+    <td>Position</td>
+    <td><%= @user.position  %></td>
+  </tr>
+  <tr>
+    <td>Department</td>
+    <td><%= @user.department  %></td>
+  </tr>
+  <tr>
+    <td>Telephone</td>
+    <td><%= link_to @user.telephone, "tel:" + @user.telephone %></td>
+  </tr>
+  <tr>
+    <td>Email address</td>
+    <td><%= mail_to @user.email , nil , subject: "Capacity query" , body: "Do you have any capacity for  new matter?" %></td>
+  </tr>
+</table>

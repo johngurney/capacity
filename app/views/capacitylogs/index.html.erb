@@ -1,0 +1,31 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Capacitylogs</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>User</th>
+      <th>Comment</th>
+      <th>Capacitycode</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @capacitylogs.each do |capacitylog| %>
+      <tr>
+        <td><%= capacitylog.user_id %></td>
+        <td><%= capacitylog.comment %></td>
+        <td><%= capacitylog.capacitycode %></td>
+        <td><%= link_to 'Show', capacitylog %></td>
+        <td><%= link_to 'Edit', edit_capacitylog_path(capacitylog) %></td>
+        <td><%= link_to 'Destroy', capacitylog, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Capacitylog', new_capacitylog_path %>

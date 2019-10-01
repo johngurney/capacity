@@ -1,0 +1,2 @@
+module CapacitylogsHelper
+end

@@ -1,0 +1,27 @@
+<%= form_with(model: capacitycode, local: true) do |form| %>
+  <% if capacitycode.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(capacitycode.errors.count, "error") %> prohibited this capacitycode from being saved:</h2>
+
+      <ul>
+      <% capacitycode.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :text %>
+    <%= form.text_field :text %>
+  </div>
+
+  <div class="field">
+    <%= form.label :number %>
+    <%= form.number_field :number %>
+  </div>
+
+  <div class="actions">
+    <%= form.submit %>
+  </div>
+<% end %>
