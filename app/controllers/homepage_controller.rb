@@ -141,9 +141,8 @@ class HomepageController < ApplicationController
         user.user_type = "User"
         user.save
       end
-      if user.capacity_number.blank? || user.capacity_number.to_i == 0
-        user.capacity_number = 1
-        user.save
+      if Capacitylog.where(:user_id => user.id).count == 0
+        Capacitylog.create(:user_id => user.id, :capacity_number => 1, :absent => false).count ==0
       end
     end
 
