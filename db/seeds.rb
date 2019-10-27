@@ -21,22 +21,35 @@ public
 # code = Capacitycode.create(text: "not busy lots of capacity", number: 1 )
 # code.save
 
-Area.delete_all
+# Area.delete_all
+#
+# area = Area.create(name: "Public law")
+# area.save
+#
+# area = Area.create(name: "Arbitration")
+# area.save
+#
+# area = Area.create(name: "Media law")
+# area.save
+#
+# area = Area.create(name: "IT disputes")
+# area.save
+#
+# area = Area.create(name: "Fraud")
+# area.save
+#
+# area = Area.create(name: "Corporate disputes")
+# area.save
 
-area = Area.create(name: "Public law")
-area.save
+locations = ["London", "Manchester", "Edinburgh", "Sheffield", "Glasgow", "Reading", "Liverpool", "Bristol"]
+Location.delete_all
+locations.each do |l|
+  Location.create(:name => l)
+end
 
-area = Area.create(name: "Arbitration")
-area.save
 
-area = Area.create(name: "Media law")
-area.save
-
-area = Area.create(name: "IT disputes")
-area.save
-
-area = Area.create(name: "Fraud")
-area.save
-
-area = Area.create(name: "Corporate disputes")
-area.save
+departments = ["L&A", "Employment", "Insurance", "FS lit", "Energy"]
+Department.delete_all
+departments.each do |d|
+  Department.create(:name => d)
+end

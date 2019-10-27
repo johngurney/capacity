@@ -14,3 +14,17 @@
 //= require activestorage
 //= require turbolinks
 //= require_tree .
+
+function file_field_tag_browse_click(id){
+   var fileVal=document.getElementById(id + "file-upload");
+   if (fileVal.value != "") {
+     var name = fileVal.value.split('\\').pop().split('/').pop();
+     document.getElementById(id + "file_field_path_label").innerHTML = name;
+     document.getElementById(id + "file_field_path_div").style.display = "inline-flex";
+     document.getElementById(id + "file_field_upload").style.display = "block";
+   } else {
+     document.getElementById(id + "file_field_path_label").innerHTML = "";
+     document.getElementById(id + "file_field_path_div").style.display = "none";
+     document.getElementById(id + "file_field_upload").style.display = "none";
+     }
+  }

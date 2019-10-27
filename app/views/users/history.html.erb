@@ -1,0 +1,111 @@
+<script type="text/javascript">
+
+  window.onload = update_charts;
+
+  (function() {
+    update_charts();
+    }).call(this);
+
+
+  function update_charts() {
+
+      months = [<%= @user.months.html_safe %>]
+      xs = [<%= @user.capacity_xs %> ]
+      ys = [<%= @user.capacity_ys %> ]
+      var average_value = <%= @user.average_capacity %>;
+
+
+      var c = document.getElementById("capacity_canvas");
+      var ctx = c.getContext("2d");
+      var x0 = c.width * .1, xright = c.width * .9;
+      var y0 = c.height * .9, ytop = c.height * .2;
+      var graph_w = xright - x0, graph_h = ytop - y0;
+
+      ctx.fillStyle = "black";
+      ctx.strokeStyle = "black";
+
+      ctx.beginPath();
+      ctx.moveTo(x0, ytop);
+      ctx.stroke();
+      ctx.lineTo(x0, y0);
+      ctx.stroke();
+      ctx.lineTo(xright, y0);
+      ctx.stroke();
+
+      var n1 = 0, flag = false, xpos1, ypos1;
+      ctx.textAlign = "center";
+
+      ctx.font = "10px Arial";
+      months.forEach (function(m) {
+        var xpos = x0 + (n1 + .5) / months.length * graph_w;
+        ctx.fillText(m, xpos, y0 + 14);
+        n1 += 1;
+      })
+
+      ctx.font = "14px Arial";
+      ctx.textAlign = "right";
+      for (n = 0; n <= 4; n++) {
+        var ypos = y0 + n / 4  * graph_h;
+        ctx.moveTo(x0, ypos);
+        ctx.stroke();
+        ctx.lineTo(x0 - 4, ypos);
+        ctx.stroke();
+        ctx.fillText(n, x0 - 8, ypos + 4);
+      }
+
+
+      n1 = 0;
+
+
+      xs.forEach (function(x) {
+        var xpos = x0 + x * graph_w;
+        var ypos = y0 + ys[n1] / 4 * graph_h;
+
+        if (flag) {
+          ctx.moveTo(xpos1, ypos1);
+          ctx.stroke();
+          ctx.lineTo(xpos, ypos);
+          ctx.stroke();
+
+        }
+        flag = true;
+        xpos1 = xpos;
+        ypos1 = ypos;
+        n1 += 1;
+
+      })
+
+
+      ctx.font = "20px Arial";
+      ctx.textAlign = "left";
+      ctx.fillText("Capacity history for <%= @user.name %>", c.width * .02, c.height * .06 );
+
+      ctx.font = "10px Arial";
+      ctx.fillStyle = "red";
+      // ctx.strokeStyle = "red";
+
+      ypos = y0 + average_value / 4 * graph_h;
+      ctx.moveTo(x0, ypos);
+      ctx.stroke();
+      ctx.lineTo(xright, ypos);
+      ctx.stroke();
+
+      ctx.textAlign = "right";
+      ctx.fillText("Average", x0 - 6, ypos + 4);
+
+      ctx.textAlign = "left";
+      ctx.fillText(average_value, xright + 6, ypos + 4 );
+    }
+</script>
+<%= @test %>
+<h1>History</h1>
+<canvas id="capacity_canvas" width="700" height="500" style="border:1px solid #000000; background-color:white; "></canvas>
+<%= form_tag selected_history_path, method: "get" do %>
+<div style ="display: inline-flex; flex-direction: row; align-items: center" >
+  Start date
+  <%= date_field_tag :start_date, Date.today, :class=>"small_button" %>
+  End date
+  <%= date_field_tag :end_date, 1.years.ago.strftime("%Y-%m-%d"), :class=>"small_button"  %>
+  <%= submit_tag "Ok", :class=>"small_button"  %>
+</div>
+<% end %>

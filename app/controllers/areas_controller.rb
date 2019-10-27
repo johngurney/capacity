@@ -61,6 +61,27 @@ class AreasController < ApplicationController
     end
   end
 
+  def upload_areas_file
+
+    uploaded_io = params[:file]
+
+    if uploaded_io.present?
+
+      text = uploaded_io.read
+
+      text.each_line do |line|
+        line.gsub!("\r\n", '')
+        if Area.where("lower(name) = ?", line.downcase).count == 0
+          area = Area.new
+          area.name = line
+          area.save
+        end
+      end
+    end
+
+    redirect_to areas_path
+  end
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_area

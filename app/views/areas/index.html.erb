@@ -11,10 +11,9 @@
   </thead>
 
   <tbody>
-    <% @areas.each do |area| %>
+    <% @areas.order(:name).each do |area| %>
       <tr>
         <td><%= area.name %></td>
-        <td><%= link_to 'Show', area %></td>
         <td><%= link_to 'Edit', edit_area_path(area) %></td>
         <td><%= link_to 'Destroy', area, method: :delete, data: { confirm: 'Are you sure?' } %></td>
       </tr>
@@ -24,4 +23,14 @@
 
 <br>
 
-<%= link_to 'New Area', new_area_path %>
+<div class="flex_col" >
+
+  <div class="flex_row" >
+    <%= button_to 'New area', new_area_path, :method => :get, :class => "small_button" %>
+  </div>
+  <div class="flex_row" >
+    <%= form_tag upload_areas_file_path, :multipart => true do  %>
+      <%= render "file_tag", title: "Upload file", name: "areas", tag: :file, class_name: "standard_button", height: 60, file_type: ".txt" %>
+    <% end %>
+  </div>
+</div>

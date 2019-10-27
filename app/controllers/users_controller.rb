@@ -1,5 +1,5 @@
 class UsersController < ApplicationController
-  before_action :set_user, only: [:show, :edit, :update, :destroy, :capacity_log]
+  before_action :set_user, only: [:show, :edit, :update, :destroy, :capacity_log, :amend_aois, :make_password, :history, :selected_history]
 
   # GET /users
   # GET /users.json
@@ -15,6 +15,9 @@ class UsersController < ApplicationController
   # GET /users/new
   def new
     @user = User.new
+    @user.department = Department.all.first
+    @user.location = Location.all.first
+    @user.user_type = "User"
   end
 
   # GET /users/1/edit
@@ -25,6 +28,9 @@ class UsersController < ApplicationController
   # POST /users.json
   def create
     @user = User.new(user_params)
+    @user.update_attributes(user_params)
+    @user.department = Department.find( params[:user][:department].to_i )
+    @user.location = Location.find( params[:user][:location].to_i )
 
     respond_to do |format|
       if @user.save
@@ -40,15 +46,13 @@ class UsersController < ApplicationController
   # PATCH/PUT /users/1
   # PATCH/PUT /users/1.json
   def update
-    respond_to do |format|
-      if @user.update(user_params)
-        format.html { redirect_to @user, notice: 'User was successfully updated.' }
-        format.json { render :show, status: :ok, location: @user }
-      else
-        format.html { render :edit }
-        format.json { render json: @user.errors, status: :unprocessable_entity }
-      end
-    end
+
+    @user.update_attributes(user_params)
+    @user.department = Department.find( params[:user][:department].to_i ) if params[:user][:department].to_i > 0
+    @user.location = Location.find( params[:user][:location].to_i ) if params[:user][:location].to_i > 0
+    @user.save
+    redirect_to @user
+
   end
 
   # DELETE /users/1
@@ -66,49 +70,55 @@ class UsersController < ApplicationController
   def upload_users_file
 
     uploaded_io = params[:file]
-    text = uploaded_io.read
 
-    flag = false
-    first_name_column = -1
-    last_name_column = -1
-    position_column = -1
-    tel_number_column = -1
-    mobile_number_column = -1
-    email_address_column = -1
+    if uploaded_io.present?
+      text = uploaded_io.read
 
-    text.each_line do |line|
-      line.gsub!("\r\n", '')
+      flag = false
+      first_name_column = -1
+      last_name_column = -1
+      position_column = -1
+      tel_number_column = -1
+      mobile_number_column = -1
+      email_address_column = -1
 
-      values=line.split "\t"
-      if flag == false
-        puts values.to_s
-        first_name_column = find_in_array(values, "first_name")
-        last_name_column = find_in_array(values, "last_name")
-        position_column = find_in_array(values, "position")
-        tel_number_column = find_in_array(values, "tel_number")
-        email_address_column = find_in_array(values, "email_address")
-        flag=true
-      else
+      text.each_line do |line|
+        line.gsub!("\r\n", '')
 
-        user = User.new
-        if first_name_column >= 0
-          user.first_name = values[first_name_column]
-        end
-        if last_name_column >= 0
-          user.last_name  = values[last_name_column]
-        end
-        if position_column >= 0
-          user.position   = values[position_column]
-        end
-        #user.password   = "test"
-        if tel_number_column >= 0
-          user.telephone   = values[tel_number_column]
-        end
+        values=line.split "\t"
+        if flag == false
+          puts values.to_s
+          first_name_column = find_in_array(values, "first_name")
+          last_name_column = find_in_array(values, "last_name")
+          position_column = find_in_array(values, "position")
+          tel_number_column = find_in_array(values, "tel_number")
+          email_address_column = find_in_array(values, "email_address")
+          flag=true
+        else
 
-        if email_address_column >= 0
-          user.email   = values[email_address_column]
+          user = User.new
+          if first_name_column >= 0
+            user.first_name = values[first_name_column]
+          end
+          if last_name_column >= 0
+            user.last_name  = values[last_name_column]
+          end
+          if position_column >= 0
+            user.position   = values[position_column]
+          end
+
+          if tel_number_column >= 0
+            user.telephone   = values[tel_number_column]
+          end
+
+          if email_address_column >= 0
+            user.email   = values[email_address_column]
+          end
+
+          user.user_type = "User"
+
+          user.save if User.where("lower(email) = ?", user.email.downcase).count == 0
         end
-        user.save if User.where("lower(email) = ?", user.email).count == 0
 
       end
     end
@@ -125,6 +135,44 @@ class UsersController < ApplicationController
 
   end
 
+  def amend_aois
+    if params[:commit] == "Add area(s)"
+      Area.all.each do |area|
+        @user.areas << area if params["checkadd" + area.id.to_s ] == "1"
+      end
+
+    elsif params[:commit] == "Remove area(s)"
+      Area.all.each do |area|
+        @user.areas.delete(area) if params["checkremove" + area.id.to_s ] == "1"
+      end
+    end
+    redirect_to root_path
+  end
+
+  def passwords
+  end
+
+
+  def make_password
+    @user.make_password
+    redirect_to passwords_path
+  end
+
+
+  def make_all_passwords
+    User.all.each do |user|
+      user.make_password
+    end
+    redirect_to passwords_path
+  end
+
+  def history
+  end
+
+  def selected_history
+    @test="This is a test"
+    render "history"
+  end
 
 
   private
@@ -135,7 +183,7 @@ class UsersController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def user_params
-      params.require(:user).permit(:first_name, :last_name, :user_type, :location, :position, :telephone, :email)
+      params.require(:user).permit(:first_name, :last_name, :user_type, :position, :telephone, :email)
     end
 
     def find_in_array(arry , text)

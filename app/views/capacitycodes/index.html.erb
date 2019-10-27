@@ -1,12 +1,12 @@
 <p id="notice"><%= notice %></p>
 
-<h1>Capacitycodes</h1>
+<h1>Capacity codes</h1>
 
 <table>
   <thead>
     <tr>
-      <th>Text</th>
       <th>Number</th>
+      <th>Text</th>
       <th colspan="3"></th>
     </tr>
   </thead>
@@ -14,9 +14,8 @@
   <tbody>
     <% @capacitycodes.each do |capacitycode| %>
       <tr>
+        <td><%= capacitycode.capacity_number %></td>
         <td><%= capacitycode.text %></td>
-        <td><%= capacitycode.number %></td>
-        <td><%= link_to 'Show', capacitycode %></td>
         <td><%= link_to 'Edit', edit_capacitycode_path(capacitycode) %></td>
         <td><%= link_to 'Destroy', capacitycode, method: :delete, data: { confirm: 'Are you sure?' } %></td>
       </tr>
@@ -26,4 +25,14 @@
 
 <br>
 
-<%= link_to 'New Capacitycode', new_capacitycode_path %>
+<div class="flex_col" >
+
+  <div class="flex_row" >
+    <%= button_to 'New capacity code', new_capacitycode_path, :method => :get, :class => "small_button", :style => "width: 140px" %>
+  </div>
+  <div class="flex_row" >
+    <%= form_tag upload_capcodes_file_path, :multipart => true do  %>
+      <%= render "file_tag", title: "Upload file", name: "areas", tag: :file, class_name: "standard_button", height: 60, file_type: ".txt" %>
+    <% end %>
+  </div>
+</div>

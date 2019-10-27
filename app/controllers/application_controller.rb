@@ -1,7 +1,8 @@
 class ApplicationController < ActionController::Base
 
-  before_action :check_cookie_consent, except: [:cookie_consent, :log_in, :contact_sheet, :cheat_log_in ]
-  before_action :check_logged_in, except: [:cookie_consent, :log_in, :contact_sheet, :cheat_log_in]
+  before_action :check_cookie_consent, except: [:cookie_consent, :log_in, :contact_sheet, :cheat_log_in, :set_allow_cheat_logon ]
+  before_action :check_logged_in, except: [:cookie_consent, :log_in, :contact_sheet, :cheat_log_in, :set_allow_cheat_logon]
+  before_action :check_admin, except: [:cookie_consent, :log_in, :contact_sheet, :cheat_log_in, :homepage, :show, :amend_aois, :capacity_log, :history, :selected_history, :set_allow_cheat_logon]
 
   def check_cookie_consent
     if session[:cookie_consent].blank?
@@ -19,8 +20,7 @@ class ApplicationController < ActionController::Base
     #Check in case user deleted during session
     session[:logged_in_user] = nil if !session[:logged_in_user].blank? && !User.exists?(id: session[:logged_in_user].to_i)
 
-    if User.all.count >0
-
+    if check_if_admins_exist?
       if session[:logged_in_user].blank?
         if cookies[:logged_in_token].blank? or ( ( (log_in_logs = Loginlog.where(:token => cookies[:logged_in_token])).count == 0 ) or !User.exists?(id: log_in_logs.first.user_id) )
           render 'general/password'
@@ -32,6 +32,19 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def check_if_admins_exist?
+    User.all.count > 0 && User.where(:user_type => "Administrator").count > 0
+  end
+
+
+  def check_admin
+    if logged_in_user_helper.present? && !logged_in_user_helper.is_admin? && check_if_admins_exist?
+      redirect_to root_path
+      false
+    end
+
+  end
+
 
   def telephone_link(tel_no)
       tel_no_mod = tel_no.to_s.scan(/(?:^\+)?\d+/)
@@ -40,7 +53,6 @@ class ApplicationController < ActionController::Base
 
   def logged_in_user_helper
     user = User.find(session[:logged_in_user]) if !session[:logged_in_user].blank? and User.exists?(id:  session[:logged_in_user].to_i)
-    puts "User =" + user.to_s
     user
   end
 

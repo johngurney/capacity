@@ -1,0 +1,4 @@
+1	Not busy
+2	Pretty busy
+3	Quite busy
+4	Extremely busy

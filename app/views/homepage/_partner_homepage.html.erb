@@ -1,0 +1,264 @@
+<script type="text/javascript">
+
+  var emails, checkboxes;
+  checkboxes = <%= @checkboxes %>;
+
+  function send_email() {
+    <% if @emails %>
+    emails = <%= @emails.html_safe %>;
+    <% end %>
+    var stg = "";
+    n = 0;
+    checkboxes.forEach (function(user_id) {
+      if (document.getElementById("checkbox" + user_id).checked)
+      {
+        stg += emails[n] + "; ";
+      }
+      n += 1;
+    })
+    window.open("mailto:" + stg );
+  }
+
+  function check_box_click(){
+    var flag = false;
+    checkboxes.forEach (function(user_id) {
+      if (document.getElementById("checkbox" + user_id).checked)
+      {
+        flag = true;
+      }
+    })
+    if (flag) {
+      document.getElementById("send_email_button").style.display = "block";
+    } else {
+      document.getElementById("send_email_button").style.display = "none";
+    }
+  }
+
+  var check_areas = [<%= get_all_ids(Area)%>];
+  var check_locations = [<%= get_all_ids(Location)%>];
+  var check_departments = [<%= get_all_ids(Department)%>];
+
+  function check_areas_on_off(v) {
+    check_areas.forEach (function(cb) {
+      document.getElementById("check_area"+cb).checked = v;
+    })
+  }
+
+  function check_departments_on_off(v) {
+    check_departments.forEach (function(cb) {
+      document.getElementById("check_department"+cb).checked = v;
+    })
+  }
+
+  function check_locations_on_off(v) {
+    check_locations.forEach (function(cb) {
+      document.getElementById("check_location"+cb).checked = v;
+    })
+  }
+
+</script>
+
+<button id="send_email_button" onclick="send_email();" class="small_button" style="width: 200px; display: none">Send email to all selected users</button>
+
+<h2>Non absent users</h2>
+
+<table width="80%" >
+  <col width="20%">
+  <col width="10%">
+  <col width="10%">
+  <col width="10%">
+  <col width="20%">
+  <col width="15%">
+  <col width="15%">
+  <tr style="font-weight: bold">
+    <td>
+      Name
+    </td>
+    <td>
+      Email
+    </td>
+    <td>
+      Location
+    </td>
+    <td>
+      Department
+    </td>
+    <td>
+      Position
+    </td>
+    <td>
+      Capacity
+    </td>
+    <td>
+      Comments
+    </td>
+  </tr>
+  <% if @non_absent_users %>
+    <% @non_absent_users.each do |user| %>
+    <tr >
+      <td>
+        <%= link_to user[:user].name, user_path(user[:user]) %>
+      </td>
+      <td>
+        <input type="checkbox" id="checkbox<%= user[:user].id.to_s %>" style="width: 20px; height: 20px" name="user" onchange="check_box_click()"></td>
+      </td>
+      <td>
+        <%= user[:user].location_name %>
+      </td>
+      <td>
+        <%= user[:user].department_name %>
+      </td>
+      <td>
+        <%= user[:user].position %>
+      </td>
+      <td>
+        <%= user[:capacity_number] %><% if user[:capacity_number] != 0 %> - <%= Capacitycode.where(:capacity_number => user[:capacity_number]).first.text %><% end %>
+        <% if !user[:capacity_log].blank? %>(Last updated <%= user[:capacity_log].created_at.strftime("%d %b %Y")%>)<% end %>
+
+      </td>
+      <td>
+        <% if !user[:capacity_log].blank? %>
+          <%= user[:capacity_log].comment %>
+        <% end %>
+      </td>
+
+      <% end %>
+    <% end %>
+</table>
+
+<h2>Absent users</h2>
+
+<table width="100%" >
+  <col width="20%">
+  <col width="10%">
+  <col width="10%">
+  <col width="10%">
+  <col width="20%">
+  <col width="15%">
+  <col width="15%">
+  <tr style="font-weight: bold">
+    <td>
+      Name
+    </td>
+    <td>
+      Email
+    </td>
+    <td>
+      Location
+    </td>
+    <td>
+      Department
+    </td>
+    <td>
+      Position
+    </td>
+    <td>
+      Capacity
+    </td>
+    <td>
+      Comments
+    </td>
+  </tr>
+  <% if @absent_users %>
+    <% @absent_users.each do |user| %>
+      <tr>
+        <td>
+          <%= link_to user[:user].name, user_path(user[:user]) %>
+        </td>
+        <td>
+          <input type="checkbox" id="checkbox<%= user[:user].id.to_s %>" name="user"></td>
+        </td>
+        <td>
+          <%= user[:user].location_name %>
+        </td>
+        <td>
+          <%= user[:user].department_name %>
+        </td>
+        <td>
+          <%= user[:user].position %>
+        </td>
+        <td>
+          <%= user[:capacity_number] %><% if user[:capacity_number] != 0 %> - <%= Capacitycode.where(:capacity_number => user[:capacity_number]).first.text %><% end %>
+          <% if !user[:capacity_log].blank? %>(Last updated <%= user[:capacity_log].created_at.strftime("%d %b %Y")%>)<% end %>
+
+        </td>
+        <td>
+          <% if !user[:capacity_log].blank? %>
+            <%= user[:capacity_log].comment %>
+          <% end %>
+        </td>
+      </tr>
+    <% end %>
+  <% end %>
+</table>
+
+<%= form_tag search_aois_path, method: "get" do %>
+
+  <div class="select_box_wrapper" style="height: 190px">
+    <h3>Refine search</h3>
+    <table>
+      <col width="50%">
+      <col width="25%">
+      <col width="25%">
+      <tr>
+        <td>
+          <div class="select_box_wrapper" style="height: 106px; border: 2px solid black">
+            <div style ="display: inline-flex; flex-direction: row" >
+              <h4>Areas of interest</h4>
+              <button class="very_small_button" type="button" onclick="check_areas_on_off(true)" style="margin-left: 20px">All on</button>
+              <button class="very_small_button" type="button" onclick="check_areas_on_off(false)">All off</button>
+            </div>
+            <div class="select_box_list" style="height: 88px">
+              <% Area.all.each do |area| %>
+                <span style="white-space: nowrap;">
+                  <%= check_box_tag 'check_area'+ area.id.to_s, 1, (@included_areas.blank? or @included_areas.include?(area.id)) %>
+                  <%= area.name %>
+                </span>
+              <% end %>
+            </div>
+          </div>
+        </td>
+        <td>
+          <div class="select_box_wrapper" style="height: 106px; border: 2px solid black">
+            <div style ="display: inline-flex; flex-direction: row" >
+              <h4>Locations</h4>
+              <button class="very_small_button" type="button" onclick="check_locations_on_off(true)" style="margin-left: 20px">All on</button>
+              <button class="very_small_button" type="button" onclick="check_locations_on_off(false)">All off</button>
+            </div>
+
+            <div class="select_box_list" style="height: 88px; margin-top: 0px">
+              <% Location.all.each do |location| %>
+                <span style="white-space: nowrap;">
+                  <%= check_box_tag 'check_location'+ location.id.to_s, 1, (@included_locations.blank? or @included_locations.include?(location.id)) %>
+                  <%= location.name %>
+                </span>
+              <% end %>
+            </div>
+          </div>
+        </td>
+        <td>
+          <div class="select_box_wrapper" style="height: 106px; border: 2px solid black">
+            <div style ="display: inline-flex; flex-direction: row" >
+              <h4>Departments</h4><br/>
+              <button class="very_small_button" type="button" onclick="check_departments_on_off(true)" style="margin-left: 20px">All on</button>
+              <button class="very_small_button" type="button" onclick="check_departments_on_off(false)">All off</button>
+            </div>
+
+            <div class="select_box_list" style="height: 88px; margin-top: 0px">
+              <% Department.all.each do |department| %>
+                <span style="white-space: nowrap;">
+                  <%= check_box_tag 'check_department'+ department.id.to_s, 1, (@included_departments.blank? or @included_departments.include?(department.id)) %>
+                  <%= department.name %>
+                </span>
+              <% end %>
+            </div>
+          </div>
+        </td>
+      <tr>
+    </table>
+    <div style ="display: inline-flex; flex-direction: row" >
+      <%= submit_tag "Search", :class =>"small_button" %>
+      <%= submit_tag "Clear search", :class =>"small_button" %>
+    </div>
+  </div>
+<% end %>

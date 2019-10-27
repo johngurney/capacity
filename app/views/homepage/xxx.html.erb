@@ -1,0 +1,148 @@
+<h1>Partner page</h1>
+<script type="text/javascript">
+
+  function send_email() {
+    var emails, checkboxes,stg;
+    emails = <%= @emails.html_safe %>;
+    checkboxes = <%= @checkboxes %>;
+    stg = "";
+    n = 0;
+    alert("test");
+    checkboxes.forEach (function(user_id) {
+      if (document.getElementById("checkbox" + user_id).checked)
+      {
+        stg += emails[n] + "; ";
+      }
+      n += 1;
+    })
+    window.open("mailto:" + stg );
+  }
+
+
+
+</script>
+
+<button onclick="send_email();" class="small_button" style="width: 200px">Send email to all selected users</button>
+
+<h2>Non absent users</h2>
+
+<table width="80%" >
+  <col width="20%">
+  <col width="10%">
+  <col width="20%">
+  <col width="25%">
+  <col width="25%">
+  <tr style="font-weight: bold">
+    <td>
+      Name
+    </td>
+    <td>
+      Email
+    </td>
+    <td>
+      Position
+    </td>
+    <td>
+      Capacity
+    </td>
+    <td>
+      Comments
+    </td>
+  </tr>
+  <% @non_absent_users.each do |user| %>
+  <tr >
+    <td>
+      <%= link_to user[:user].name, user_path(user[:user]) %>
+    </td>
+    <td>
+      <input type="checkbox" id="checkbox<%= user[:user].id.to_s %>" name="user"></td>
+    <td>
+      <%= user[:user].position %>
+    </td>
+    <td>
+      <%= user[:capacity_number] %><% if user[:capacity_number] != 0 %> - <%= Capacitycode.where(:capacity_number => user[:capacity_number]).first.text %><% end %>
+      <% if !user[:capacity_log].blank? %>(Last updated <%= user[:capacity_log].created_at.strftime("%d %b %Y")%>)<% end %>
+
+    </td>
+    <td>
+      <% if !user[:capacity_log].blank? %>
+        <%= user[:capacity_log].comment %>
+      <% end %>
+    </td>
+
+    <% end %>
+</table>
+
+<h2>Absent users</h2>
+
+<table width="80%" >
+  <col width="20%">
+  <col width="10%">
+  <col width="20%">
+  <col width="25%">
+  <col width="25%">
+  <tr style="font-weight: bold">
+    <td>
+      Name
+    </td>
+    <td>
+      Email
+    </td>
+    <td>
+      Position
+    </td>
+    <td>
+      Capacity
+    </td>
+    <td>
+      Comments
+    </td>
+  </tr>
+  <% @absent_users.each do |user| %>
+    <tr>
+      <td>
+        <%= link_to user[:user].name, user_path(user[:user]) %>
+      </td>
+      <td>
+        <input type="checkbox" id="checkbox<%= user[:user].id.to_s %>" name="user"></td>
+      </td>
+      <td>
+        <%= user[:user].position %>
+      </td>
+      <td>
+        <%= user[:capacity_number] %><% if user[:capacity_number] != 0 %> - <%= Capacitycode.where(:capacity_number => user[:capacity_number]).first.text %><% end %>
+        <% if !user[:capacity_log].blank? %>(Last updated <%= user[:capacity_log].created_at.strftime("%d %b %Y")%>)<% end %>
+
+      </td>
+      <td>
+        <% if !user[:capacity_log].blank? %>
+          <%= user[:capacity_log].comment %>
+        <% end %>
+      </td>
+    </tr>
+  <% end %>
+</table>
+
+<%= form_tag search_aois_path, method: "get" do %>
+
+  <div class="select_box_wrapper" style="height: 106px">
+    <h3>Areas of interest</h3>
+
+    <div class="select_box_list" style="height: 50px">
+      <table>
+        <col width="50%">
+        <col width="50%">
+          <% Area.all.each do |area| %>
+            <span style="white-space: nowrap;">
+              <%= check_box_tag 'check'+ area.id.to_s, 1, (@included_areas.blank? or @included_areas.include?(area.id)) %>
+              <%= area.name %>
+            </span>
+          <% end %>
+      </table>
+    </div>
+    <div style ="display: inline-flex; flex-direction: row" >
+      <%= submit_tag "Search", :class =>"small_button" %>
+      <%= submit_tag "Clear search", :class =>"small_button" %>
+    </div>
+  </div>
+<% end %>

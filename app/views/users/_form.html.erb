@@ -12,42 +12,45 @@
   <% end %>
 
 
-    <table width="50%">
-      <col width="30%">
-      <col width="70%">
-      <tr>
-        <td>First name</td>
-        <td><%= form.text_field :first_name  %></td>
-      </tr>
-      <tr>
-        <td>Last name</td>
-        <td><%= form.text_field :last_name  %></td>
-      </tr>
-      <tr>
-        <td>User type</td>
-        <td><%= form.select :user_type, ["Administrator", "Partner", "User"] %></td>
-      <tr>
-        <td>Position</td>
-        <td><%= form.text_field :position  %></td>
-      </tr>
-      <tr>
-        <td>Department</td>
-        <td><%= form.text_field :department  %></td>
-          <tr>
-      </tr>
-        <td>Telephone</td>
-        <td><%= form.text_field :telephone  %></td>
-      </tr>
-      <tr>
-        <td>Email address</td>
-        <td><%= form.text_field :email  %></td>
-      </tr>
-    </table>
+  <table width="100%">
+    <col width="15%">
+    <col width="35%">
+    <col width="15%">
+    <col width="35%">
+    <tr>
+      <td>First name</td>
+      <td><%= form.text_field :first_name, :class => "small_field"  %></td>
+      <td>Last name</td>
+      <td><%= form.text_field :last_name, :class => "small_field"  %></td>
+    </tr>
+    <tr>
+      <td>User type</td>
+      <td><%= form.select :user_type, ["Administrator", "Partner", "User"],{:include_blank => "None"}, {class: "small_field" , style: "width: 150px"}%></td>
+      <td>Position</td>
+      <td><%= form.text_field :position, :class => "small_field"  %></td>
+    </tr>
+    <tr>
+      <td>Department</td>
+      <td><%= form.select :department, options_for_select(Department.all.order(:name).map{|department| [department.name, department.id]}, user.department_id), {:include_blank => "None"}, {class: "small_field" , style: "width: 150px"}%></td>
+      <td>Location</td>
+      <td><%= form.select :location, options_for_select(Location.all.order(:name).map{|location| [location.name, location.id]}, user.location_id), {:include_blank => "None"}, {class: "small_field" , style: "width: 150px"}%></td>
+    </tr>
+    <tr>
+      <td>Telephone</td>
+      <td><%= form.text_field :telephone , :class => "small_field" %></td>
+      <td>Email address</td>
+      <td><%= form.text_field :email, :class => "small_field"  %></td>
+    </tr>
+    <tr>
+      <td>
+      </td>
+      <td>
+        <%= form.submit "Update", :class => "small_button" %>
+      </td>
+    </tr>
+  </table>
 
 
 
 
-  <div class="actions">
-    <%= form.submit %>
-  </div>
 <% end %>

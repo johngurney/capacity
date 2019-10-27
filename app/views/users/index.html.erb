@@ -15,7 +15,8 @@
         <td><%= user.name %></td>
         <td><%= user.user_type %></td>
         <td><%= user.position %></td>
-        <td><%= user.location %></td>
+        <td><%= user.department_name %></td>
+        <td><%= user.location_name %></td>
         <td><%= link_to 'Show', user %></td>
         <td><%= link_to 'Edit', edit_user_path(user) %></td>
         <td><%= link_to 'Destroy', user, method: :delete, data: { confirm: 'Are you sure?' } %></td>
@@ -26,17 +27,15 @@
 
 <br>
 
-<%= form_tag upload_users_file_path, :multipart => true do  %>
-  <span class="small_user" >
-    <span style="font-size: 12pt; font-family: Arial; margin-right: 25px">
-    Upload file of users
-    </span>
-    <span class="btn1 btn-large btn-warning btn-file">
-      Choose file
-      <%= file_field_tag :file %>
-    </span>
-  </span>
-    <%= submit_tag "Upload",  {:class=>"standard_button", :style =>"width: 120px; margin-left: 10px"} %>
-<% end %>
+<div class="flex_col" >
 
-<%= link_to 'New User', new_user_path %>
+  <div class="flex_row" >
+    <%= button_to 'New User', new_user_path, :method => :get, :class => "small_button" %>
+    <%= button_to 'Passwords', passwords_path, :method => :get, :class => "small_button" %>
+  </div>
+  <div class="flex_row" >
+    <%= form_tag upload_users_file_path, :multipart => true do  %>
+      <%= render "file_tag", title: "Upload file", name: "users", tag: :file, class_name: "standard_button", height: 60, file_type: ".txt" %>
+    <% end %>
+  </div>
+</div>

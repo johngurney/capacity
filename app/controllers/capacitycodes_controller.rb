@@ -61,6 +61,29 @@ class CapacitycodesController < ApplicationController
     end
   end
 
+  def upload_capcodes_file
+
+    uploaded_io = params[:file]
+
+    if uploaded_io.present?
+
+      text = uploaded_io.read
+
+      text.each_line do |line|
+        line.gsub!("\r\n", '')
+        values = line.split "\t"
+        if Capacitycode.where("lower(text) = ?", values[1].downcase).count == 0
+          capacitycode = Capacitycode.new
+          capacitycode.capacity_number = values[0].to_i
+          capacitycode.text = values[1]
+          capacitycode.save
+        end
+      end
+    end
+
+    redirect_to capacitycodes_path
+  end
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_capacitycode

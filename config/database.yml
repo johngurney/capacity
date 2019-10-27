@@ -31,18 +31,18 @@
 
   development:
     <<: *default
-    database: contacts
+    database: capacity
     username: postgres
     password: password
 
   test:
     <<: *default
-    database: contacts
+    database: capacity
     username: postgres
     password: password
 
-  # production:
-  #   <<: *default
-  #   database: d8djrgu54ikie4
-  #   username: tyjaccnaxodlzj
-  #   password: d5c7d6b5c081cefc226aafcce5338f1cb63d3e2eaab9fb0c6930408bb186858a
+production:
+  <<: *default
+  database: d20hb7o0hhtb91
+  username: fnqwlfwdwgbuqr
+  password: 6223beba91ddeb81e99b72c82aeb23c5ac78eb412f5b14088a829e30db21d0c6

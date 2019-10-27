@@ -10,15 +10,39 @@
   </head>
 
   <body>
-    <% if !(user = logged_in_user_helper).blank? then %>
-      Logged in as <%= user.name %><br/>
-    <% end %>
+    <table width="100%">
+      <col width="5%">
+      <col width="20%">
+      <col width="50%">
+      <col width="25%">
+      <tr>
+        <td>
+          <% if !(logged_in_user_helper).blank? && logged_in_user_helper.user_type == "Administrator" then %>
+            <%= link_to "Home", root_path %>
+          <% end %>
+        </td>
+        <td><%= image_tag "cms.png" %></td>
+        <td style="font-size: 40px; font-weight:bold; line-height: normal; text-align: center; padding: 0px 50px">Fee-earner capacity tracker</td>
+        <td>
+          <% if !(user = logged_in_user_helper).blank? then %>
+            Logged in as: <%= user.name %><br/>
+          <% end %>
 
-    Cheat login
-    <%= form_tag  cheat_log_in_path, id: "cheat_login" do %>
-      <%= select_tag :user, options_for_select(options_for_select(User.all.order(:last_name, :first_name).map{|user| [user.name, user.id]}), "") , {:class=> "input", :onchange => "cheat_login.submit();", :include_blank => 'Please choose',  :style => "width:150px;"} %>
-    <% end %>
-    <%= button_to "Test", test_path %>
+          <% if $allow_cheatlogon %>
+
+            Cheat login<br/>
+            <%= form_tag  cheat_log_in_path, id: "cheat_login" do %>
+              <%= select_tag :user, options_for_select(User.all.order(:last_name, :first_name).map{|user| [user.name, user.id]}, "") , {:class=> "input", :onchange => "cheat_login.submit();", :include_blank => 'Please choose',  :class=>"small_button", :style => "width:150px;"} %>
+            <% end %>
+          <% end %>
+          <%= button_to "Log off", log_out_path, :class => "small_button"  %>
+          <% if !(logged_in_user_helper).blank? && logged_in_user_helper.user_type == "Administrator" then %>
+            <%= button_to "Test", test_path, :class=>"small_button" %>
+            <%= button_to "Delete all", delete_all_path, :class=>"small_button" %>
+          <% end %>
+        </td>
+      </tr>
+    </table>
     <%= yield %>
   </body>
 </html>

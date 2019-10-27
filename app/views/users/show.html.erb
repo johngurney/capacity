@@ -18,7 +18,11 @@
   </tr>
   <tr>
     <td>Department</td>
-    <td><%= @user.department  %></td>
+    <td><%= @user.department_name  %></td>
+  </tr>
+  <tr>
+    <td>Location</td>
+    <td><%= @user.location_name  %></td>
   </tr>
   <tr>
     <td>Telephone</td>
@@ -28,4 +32,23 @@
     <td>Email address</td>
     <td><%= mail_to @user.email , nil , subject: "Capacity query" , body: "Do you have any capacity for  new matter?" %></td>
   </tr>
+  <tr>
+    <td>Areas of interest</td>
+    <td>
+      <% @user.areas.each do |area| %>
+        <%= area.name %>;
+      <% end %>
+
+    </td>
+  </tr>
 </table>
+<%= button_to "Capacity history", history_path(@user), :method => :get, :class => "small_button" %>
+<div style ="display: inline-flex; flex-direction: row" >
+  <% if logged_in_user_helper.present? && logged_in_user_helper.is_admin? %>
+    <%= button_to "Users", users_path, :method => :get, :class => "small_button" %>
+    <%= button_to "Edit user", edit_user_path(@user), :method => :get, :class => "small_button"  %>
+    <%= button_to "Delete user", user_path(@user), :method => :delete, :class => "small_button", :data => { confirm: 'Are you sure?' }  %>
+  <% else %>
+    <%= button_to "Home", root_path, :method => :get, :class => "small_button" %>
+  <% end %>
+</div>
