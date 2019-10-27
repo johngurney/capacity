@@ -106,35 +106,42 @@ class HomepageController < ApplicationController
 
   def test
 
-    Capacitylog.delete_all
+    # Capacitylog.delete_all
+    #
+    # prng = Random.new
+    # date = Date.today
+    # capacity_number = 2
+    #
+    # (1..50).each do |n|
+    #
+    #   if capacity_number >= 4
+    #     capacity_number = 3
+    #   elsif capacity_number <= 0
+    #       capacity_number = 1
+    #   else
+    #     capacity_number += + rand(3) - 1
+    #   end
+    #   no_days = prng.rand(14).to_i + 2
+    #   date -= no_days.days
+    #
+    #   puts "Date = " + date.to_s
+    #
+    #   log = Capacitylog.new
+    #   log.created_at = date
+    #   log.capacity_number = capacity_number
+    #   log.user_id = 78
+    #   log.absent = false
+    #   log.save
+    #
+    #
+    # end
 
-    prng = Random.new
-    date = Date.today
-    capacity_number = 2
-
-    (1..50).each do |n|
-
-      if capacity_number >= 4
-        capacity_number = 3
-      elsif capacity_number <= 0
-          capacity_number = 1
-      else
-        capacity_number += + rand(3) - 1
+    user.all.each do |user|
+      if user.user_type.blank?
+        user.user_type = "User"
+        user.saved
       end
-      no_days = prng.rand(14).to_i + 2
-      date -= no_days.days
 
-      puts "Date = " + date.to_s
-
-      log = Capacitylog.new
-      log.created_at = date
-      log.capacity_number = capacity_number
-      log.user_id = 78
-      log.absent = false
-      log.save
-
-
-    end
     redirect_to root_path
 
 
