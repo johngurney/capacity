@@ -142,7 +142,7 @@ class HomepageController < ApplicationController
         user.save
       end
       if Capacitylog.where(:user_id => user.id).count == 0
-        Capacitylog.create(:user_id => user.id, :capacity_number => 1, :absent => false).count ==0
+        Capacitylog.create(:user_id => user.id, :capacity_number => 1, :absent => false)
       end
     end
 
