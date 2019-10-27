@@ -141,6 +141,10 @@ class HomepageController < ApplicationController
         user.user_type = "User"
         user.save
       end
+      if user.capacity_number.blank? || user.capacity_number.to_i == 0
+        user.capacity_number = 1
+        user.save
+      end
     end
 
     redirect_to root_path
