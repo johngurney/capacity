@@ -136,7 +136,7 @@ class HomepageController < ApplicationController
     #
     # end
 
-    user.all.each do |user|
+    User.all.each do |user|
       if user.user_type.blank?
         user.user_type = "User"
         user.saved
