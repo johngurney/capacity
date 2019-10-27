@@ -141,6 +141,7 @@ class HomepageController < ApplicationController
         user.user_type = "User"
         user.saved
       end
+    end
 
     redirect_to root_path
 
