@@ -167,11 +167,42 @@ class UsersController < ApplicationController
   end
 
   def history
+    @user.history_start_date = Time.now if @user.history_start_date.blank?
+    @user.history_end_date = @user.history_start_date.prev_year if @user.history_end_date.blank?
+    @user.save
   end
 
   def selected_history
-    @test="This is a test"
-    render "history"
+    user = logged_in_user_helper
+    if params[:commit] == "Ok"
+      user.history_start_date = Date.parse(params[:start_date])
+      user.history_end_date = Date.parse(params[:end_date])
+    else
+      case params[:auto_history]
+      when "Last year"
+        user.history_start_date = 1.years.ago + 1.days
+        user.history_end_date = Date.today
+      when "Last six months"
+        user.history_start_date = 6.months.ago + 1.days
+        user.history_end_date = Date.today
+      when "Last three months"
+        user.history_start_date = 3.months.ago + 1.days
+        user.history_end_date = Date.today
+      when "Last month"
+        user.history_start_date = 1.months.ago + 1.days
+        user.history_end_date = Date.today
+      when "Last financial year"
+        user.history_start_date
+        if Date.today.month > 5
+          user.history_start_date = Date.new(Date.today.year - 1, 5, 1)
+        else
+          user.history_start_date = Date.new(Date.today.year - 2, 5, 1)
+        end
+        user.history_end_date = @user.history_start_date.next_year - 1
+      end
+    end
+    user.save
+    redirect_to history_path(@user)
   end
 
 

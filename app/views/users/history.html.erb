@@ -1,5 +1,7 @@
 <script type="text/javascript">
 
+  var RADIUS = 3;
+
   window.onload = update_charts;
 
   (function() {
@@ -9,14 +11,15 @@
 
   function update_charts() {
 
-      months = [<%= @user.months.html_safe %>]
-      xs = [<%= @user.capacity_xs %> ]
-      ys = [<%= @user.capacity_ys %> ]
-      var average_value = <%= @user.average_capacity %>;
+      months = [<%= @user.months(logged_in_user_helper.history_start_date.to_datetime, logged_in_user_helper.history_end_date.to_datetime).html_safe %>];
+      xs = [<%= @user.capacity_xs(logged_in_user_helper.history_start_date.to_datetime, logged_in_user_helper.history_end_date.to_datetime) %> ];
+      ys = [<%= @user.capacity_ys(logged_in_user_helper.history_start_date.to_datetime, logged_in_user_helper.history_end_date.to_datetime) %> ];
+      var average_value = [<%= @user.average_capacity(logged_in_user_helper.history_start_date.to_datetime, logged_in_user_helper.history_end_date.to_datetime) %>];
 
 
       var c = document.getElementById("capacity_canvas");
       var ctx = c.getContext("2d");
+
       var x0 = c.width * .1, xright = c.width * .9;
       var y0 = c.height * .9, ytop = c.height * .2;
       var graph_w = xright - x0, graph_h = ytop - y0;
@@ -26,9 +29,7 @@
 
       ctx.beginPath();
       ctx.moveTo(x0, ytop);
-      ctx.stroke();
       ctx.lineTo(x0, y0);
-      ctx.stroke();
       ctx.lineTo(xright, y0);
       ctx.stroke();
 
@@ -46,8 +47,9 @@
       ctx.textAlign = "right";
       for (n = 0; n <= 4; n++) {
         var ypos = y0 + n / 4  * graph_h;
+        ctx.beginPath();
         ctx.moveTo(x0, ypos);
-        ctx.stroke();
+        // ctx.stroke();
         ctx.lineTo(x0 - 4, ypos);
         ctx.stroke();
         ctx.fillText(n, x0 - 8, ypos + 4);
@@ -61,9 +63,17 @@
         var xpos = x0 + x * graph_w;
         var ypos = y0 + ys[n1] / 4 * graph_h;
 
+
+        ctx.beginPath();
+        ctx.moveTo(xpos, ypos);
+        ctx.arc(xpos, ypos, RADIUS, 0, 2 * Math.PI, false);
+        ctx.fillStyle = 'black';
+        ctx.strokeStyle = 'black';
+        ctx.fill();
+
         if (flag) {
+          ctx.beginPath();
           ctx.moveTo(xpos1, ypos1);
-          ctx.stroke();
           ctx.lineTo(xpos, ypos);
           ctx.stroke();
 
@@ -79,14 +89,16 @@
       ctx.font = "20px Arial";
       ctx.textAlign = "left";
       ctx.fillText("Capacity history for <%= @user.name %>", c.width * .02, c.height * .06 );
-
       ctx.font = "10px Arial";
       ctx.fillStyle = "red";
       // ctx.strokeStyle = "red";
 
-      ypos = y0 + average_value / 4 * graph_h;
-      ctx.moveTo(x0, ypos);
-      ctx.stroke();
+      //Draw average
+
+      ypos = y0 + average_value[0] / 4 * graph_h;
+      ctx.strokeStyle = "red";
+      ctx.beginPath();
+      ctx.moveTo(x0 + average_value[1] * graph_w, ypos);
       ctx.lineTo(xright, ypos);
       ctx.stroke();
 
@@ -94,18 +106,19 @@
       ctx.fillText("Average", x0 - 6, ypos + 4);
 
       ctx.textAlign = "left";
-      ctx.fillText(average_value, xright + 6, ypos + 4 );
+      ctx.fillText(average_value[0], xright + 6, ypos + 4 );
     }
 </script>
 <%= @test %>
 <h1>History</h1>
 <canvas id="capacity_canvas" width="700" height="500" style="border:1px solid #000000; background-color:white; "></canvas>
-<%= form_tag selected_history_path, method: "get" do %>
+<%= form_tag selected_history_path, method: "get", id: "selected_history" do %>
 <div style ="display: inline-flex; flex-direction: row; align-items: center" >
   Start date
-  <%= date_field_tag :start_date, Date.today, :class=>"small_button" %>
+  <%= date_field_tag :start_date, logged_in_user_helper.history_start_date.strftime("%Y-%m-%d"), :class=>"small_button" %>
   End date
-  <%= date_field_tag :end_date, 1.years.ago.strftime("%Y-%m-%d"), :class=>"small_button"  %>
+  <%= date_field_tag :end_date, logged_in_user_helper.history_end_date.strftime("%Y-%m-%d"), :class=>"small_button"  %>
   <%= submit_tag "Ok", :class=>"small_button"  %>
+  <%= select_tag :auto_history, options_for_select(["Last year", "Last six months", "Last three months", "Last month", "Last financial year"], ""),  { :include_blank => "Select" , :class => "small_button", :style =>"background: lightgray", :onchange => "selected_history.submit();"} %>
 </div>
 <% end %>

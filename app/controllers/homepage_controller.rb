@@ -106,45 +106,48 @@ class HomepageController < ApplicationController
 
   def test
 
-    # Capacitylog.delete_all
-    #
-    # prng = Random.new
-    # date = Date.today
-    # capacity_number = 2
-    #
-    # (1..50).each do |n|
-    #
-    #   if capacity_number >= 4
-    #     capacity_number = 3
-    #   elsif capacity_number <= 0
-    #       capacity_number = 1
-    #   else
-    #     capacity_number += + rand(3) - 1
-    #   end
-    #   no_days = prng.rand(14).to_i + 2
-    #   date -= no_days.days
-    #
-    #   puts "Date = " + date.to_s
-    #
-    #   log = Capacitylog.new
-    #   log.created_at = date
-    #   log.capacity_number = capacity_number
-    #   log.user_id = 78
-    #   log.absent = false
-    #   log.save
-    #
-    #
-    # end
+    user = User.where(:last_name => "Cross").first
 
-    User.all.each do |user|
-      if user.user_type.blank?
-        user.user_type = "User"
-        user.save
+    Capacitylog.delete_all
+
+    prng = Random.new
+    date = Date.today
+    capacity_number = 3
+
+    (1..30).each do |n|
+
+      capacity_number += + rand(3) - 1
+
+      if capacity_number > 4
+        capacity_number = 4
+      elsif capacity_number < 1
+          capacity_number = 1
       end
-      if Capacitylog.where(:user_id => user.id).count == 0
-        Capacitylog.create(:user_id => user.id, :capacity_number => 1, :absent => false)
-      end
+
+      no_days = prng.rand(14).to_i + 2
+      date -= no_days.days
+
+      puts "Date = " + date.to_s
+
+      log = Capacitylog.new
+      log.created_at = date
+      log.capacity_number = capacity_number
+      log.user_id = user.id
+      log.absent = false
+      log.save
+
+
     end
+
+    # User.all.each do |user|
+    #   if user.user_type.blank?
+    #     user.user_type = "User"
+    #     user.save
+    #   end
+    #   if Capacitylog.where(:user_id => user.id).count == 0
+    #     Capacitylog.create(:user_id => user.id, :capacity_number => 1, :absent => false)
+    #   end
+    # end
 
     redirect_to root_path
 

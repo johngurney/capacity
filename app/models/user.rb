@@ -81,17 +81,11 @@ class User < ApplicationRecord
   def make_password
     prng = Random.new
     self.password = Location.all.limit(1).offset(prng.rand(Location.all.count)).first.name + prng.rand(9999).to_i.to_s
-    puts "&&&&&&: " + self.password
     self.save(:validate => false)
   end
 
-  def capacity_ys
-    end_date = Time.now
-    start_date = 1.years.ago
-    puts start_date.to_s
+  def capacity_ys(start_date, end_date)
     stg = ""
-
-    puts "%%%%" + Capacitylog.where(:user_id => self.id).where("created_at >= ?", start_date).count.to_s
 
     Capacitylog.where(:user_id => self.id).where("created_at >= ? AND created_at < ?", start_date, end_date).order(:created_at).each do |log|
       stg += ", " if stg != ""
@@ -101,67 +95,94 @@ class User < ApplicationRecord
 
   end
 
-  def capacity_xs
-    end_date = Time.now
-    start_date = 1.years.ago
+  def capacity_xs(start_date, end_date)
     stg = ""
     Capacitylog.where(:user_id => self.id).where("created_at >= ? AND created_at < ?", start_date, end_date).order(:created_at).each do |log|
       stg += ", " if stg != ""
-      a = (log.created_at - start_date)
-      b = (end_date - start_date)
-      stg += ((log.created_at - start_date) / (end_date - start_date)).to_s
+      stg += ((log.created_at.to_datetime - start_date) / (end_date - start_date)).to_s
     end
     stg
 
   end
 
-  def average_capacity
+  def average_capacity(start_date, end_date)
 
     if Capacitylog.where(:user_id => self.id).count > 0
 
-      end_date = Time.now
-      start_date = 1.years.ago
-      log = Capacitylog.where(:user_id => self.id).where("created_at < ?", end_date).order(:created_at).last
-      capacity_number = 0
+      puts "end_date" + end_date.to_s
+
+      log = Capacitylog.where(:user_id => self.id).where("created_at < ?", start_date).order(:created_at).last
 
       if log.blank?
         log = Capacitylog.where(:user_id => self.id).order(:created_at).first
-        start_date = log.created_at
+        first_log_date = log.created_at.to_datetime
+      else
+        first_log_date = start_date
       end
 
-      capacity_number = log.capacity_number
-      t = 0
-      date = start_date
+      if log.present?
 
-      Capacitylog.where(:user_id => self.id).where("created_at >= ? AND created_at < ?", start_date, end_date).order(:created_at).each do |log|
-        t += ( log.created_at - date ) * capacity_number
-        date = log.created_at
         capacity_number = log.capacity_number
+
+        total = 0
+        date = first_log_date.to_datetime
+
+        Capacitylog.where(:user_id => self.id).where("created_at >= ? AND created_at < ?", start_date, end_date).order(:created_at).each do |log|
+          puts "total" + total.to_s
+          total += ( log.created_at.to_datetime - date ) * capacity_number
+          date = log.created_at.to_datetime
+          capacity_number = log.capacity_number
+        end
+
+
+        total += (end_date - date) * capacity_number
+        puts (end_date-start_date).to_s
+        puts (first_log_date - start_date).to_s
+        puts end_date.class.to_s
+        puts first_log_date.class.to_s
+        puts (end_date - first_log_date).to_s
+
+        return (total / (end_date - first_log_date)).round(2).to_s + ", " + ((first_log_date - start_date)/(end_date-start_date)).to_s
+
+
+      else
+        "0, 0"
       end
-
-      t+= (end_date - date) * capacity_number
-
-      (t / (end_date - start_date)).round(2)
-    else
-      0
+      "0, 0"
     end
 
   end
 
-  def months
-    number_of_months = 0..11
-    stg = ""
-    number_of_months.to_a.reverse.each do |month_offset|
-      stg += ", " if stg != ""
-      stg += "\"" + month_offset.months.ago.strftime("%b %y") + "\""
+  def months(start_date, end_date)
+    if end_date > start_date
+
+      months_between = (end_date.year * 12 + end_date.month) - (start_date.year * 12 + start_date.month) + 1
+      months_per_entry = (months_between.to_d / 12).ceil(0)
+
+      date = start_date.beginning_of_month
+      stg = ""
+      while date < end_date do
+        stg += ", " if stg != ""
+        stg += "\"" + date.strftime("%b %y") + "\""
+        (1..months_per_entry).each do
+          date = date.next_month
+        end
+      end
+      stg
     end
-    stg
   end
 
   def is_admin?
     !self.user_type.blank? && (self.user_type == "Administrator")
   end
 
+  def history_start_date
+    self[:history_start_date].present? ? self[:history_start_date] :  1.years.ago + 1.days
+  end
+
+  def history_end_date
+    self[:history_end_date].present? ? self[:history_end_date] :  Date.today
+  end
 
 
 end
