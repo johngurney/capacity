@@ -5,12 +5,15 @@ Rails.application.routes.draw do
   resources :capacitylogs
   resources :capacitycodes
   resources :users
+  resources :groups
 
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
   root 'homepage#homepage'
+
   post 'upload_users_file', to:  "users#upload_users_file" , as:  :upload_users_file
   post 'upload_areas_file', to:  "areas#upload_areas_file" , as:  :upload_areas_file
   post 'upload_capcodes_file', to:  "capacitycodes#upload_capcodes_file" , as:  :upload_capcodes_file
+  post 'upload_groups_file', to:  "groups#upload_groups_file" , as:  :upload_groups_file
 
 
   post 'cookie_consent'=> 'homepage#cookie_consent', as: :cookie_consent
@@ -20,6 +23,11 @@ Rails.application.routes.draw do
   post 'new_capacity_log/.:id' => 'users#capacity_log', as: :new_capacity_log
 
   post 'set_allow_cheat_logon' => 'homepage#set_allow_cheat_logon', as: :set_allow_cheat_logon
+  post 'amend_user_groups/.:id' => 'users#amend_user_groups', as: :amend_user_groups
+  post 'select_groups' => 'users#select_groups', as: :select_groups
+  post 'assign_groups/.:id' => 'users#assign_groups', as: :assign_groups
+
+  post 'set_objective/.:id' => 'users#set_objective', as: :set_objective
 
 
 

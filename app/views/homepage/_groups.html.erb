@@ -1,0 +1,16 @@
+<% if logged_in_user_helper.groups.count > 1 %>
+  <div class="select_box_wrapper" style="height: 60px; width: 250px; border-width: 2px">
+    <%= form_tag select_groups_path, method: "post" do %>
+      <div class="select_box_list" style="height: 30px">
+        <% logged_in_user_helper.groups.order(:name).each do |group| %>
+          <span style="white-space: nowrap; margin-right:15px">
+            <%= check_box_tag 'checkgroup'+ group.id.to_s, "1", logged_in_user_helper.group_selected?(group) %>
+            <%= group.name %>
+          </span>
+
+        <% end %>
+      </div>
+      <%= submit_tag "Update", :class => "small_button", :style => "width:60px; height: 20px" %>
+    <% end %>
+  </div>
+<% end %>

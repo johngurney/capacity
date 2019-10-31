@@ -1,8 +1,8 @@
 class ApplicationController < ActionController::Base
 
-  before_action :check_cookie_consent, except: [:cookie_consent, :log_in, :contact_sheet, :cheat_log_in, :set_allow_cheat_logon ]
-  before_action :check_logged_in, except: [:cookie_consent, :log_in, :contact_sheet, :cheat_log_in, :set_allow_cheat_logon]
-  before_action :check_admin, except: [:cookie_consent, :log_in, :contact_sheet, :cheat_log_in, :homepage, :show, :amend_aois, :capacity_log, :history, :selected_history, :set_allow_cheat_logon]
+  before_action :check_cookie_consent, except: [:cookie_consent, :log_in, :contact_sheet, :cheat_log_in, :set_allow_cheat_logon, :set_objective ]
+  before_action :check_logged_in, except: [:cookie_consent, :log_in, :contact_sheet, :cheat_log_in, :set_allow_cheat_logon, :set_objective]
+  before_action :check_admin, except: [:cookie_consent, :log_in, :contact_sheet, :cheat_log_in, :homepage, :show, :amend_aois, :capacity_log, :history, :selected_history, :set_allow_cheat_logon, :select_groups, :set_objective]
 
   def check_cookie_consent
     if session[:cookie_consent].blank?

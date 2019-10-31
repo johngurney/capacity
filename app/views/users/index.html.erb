@@ -1,6 +1,43 @@
 <p id="notice"><%= notice %></p>
 
+<script>
+  var group_ids = <%= (Group.all.map {|group| group.id.to_s}).to_s.html_safe %>;
+  function check_more_than_one_group() {
+    var count = 0;
+    group_ids.forEach(function(n){
+      if (document.getElementById("checkgroup" + n).checked) {
+        count += 1;
+      }
+    })
+    alert(count);
+  }
+
+</script>
+
 <h1>Users</h1>
+
+
+
+<div class="select_box_wrapper" style="height: 90px; width: 50%; border-width: 2px">
+  <h3>Groups</h3>
+  <%= form_tag select_groups_path, method: "post" do %>
+    <div class="select_box_list" style="height: 30px">
+      <table>
+      <col width="50%">
+      <col width="50%">
+        <% logged_in_user_helper.groups.order(:name).each do |group| %>
+          <span style="white-space: nowrap; margin-right:15px">
+            <%= check_box_tag 'checkgroup'+ group.id.to_s, "1", logged_in_user_helper.groups.include?(group) %>
+            <%= group.name %>
+          </span>
+
+        <% end %>
+      </table>
+    </div>
+    <%= submit_tag "Update", :class => "small_button" %>
+  <% end %>
+</div>
+
 
 <table>
   <thead>
@@ -10,7 +47,7 @@
   </thead>
 
   <tbody>
-    <% @users.order(:last_name, :first_name).each do |user| %>
+    <% @users.each do |user| %>
       <tr>
         <td><%= user.name %></td>
         <td><%= user.user_type %></td>
@@ -30,7 +67,7 @@
 <div class="flex_col" >
 
   <div class="flex_row" >
-    <%= button_to 'New User', new_user_path, :method => :get, :class => "small_button" %>
+    <%= button_to 'New User', new_user_path, :method => :get, :class => "small_button", :onclick => "check_more_than_one_group();" %>
     <%= button_to 'Passwords', passwords_path, :method => :get, :class => "small_button" %>
   </div>
   <div class="flex_row" >

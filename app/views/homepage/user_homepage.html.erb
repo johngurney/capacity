@@ -21,8 +21,24 @@
       return true;
     }
 
+    function clear_objective () {
+      document.getElementById("objective").innerHTML = "";
+    }
+
 
 </script>
+
+<style>
+
+  .bottom_right {
+    position: absolute;
+    bottom: 4px;
+    right: 4px;
+  }
+
+</style>
+
+
 <% user = logged_in_user_helper %>
 <h1>User home page for <%= user.name %></h1>
 <% if Capacitylog.where(:user_id => user.id).count > 0 %>
@@ -104,59 +120,81 @@
   <% end %>
 </div>
 
-<div class="select_box_wrapper" style="height: 156px; margin-top:4px">
-  <h3>Areas of interest</h3>
-  <%= form_tag amend_aois_path(user), method: "post" do %>
-    <table width="100%">
-      <col width="50%">
-      <col width="50%">
-      <tr>
-        <td>
-
-          <div class="select_box_wrapper" style="height: 116px; border-width: 2px">
-            <h3>Your areas of interest</h3>
-
-            <div class="select_box_list" style="height: 60px">
-              <table>
-                <col width="50%">
-                <col width="50%">
-                  <% user.areas.order(:name).each do |area| %>
-                    <span style="white-space: nowrap;">
-                      <%= check_box_tag 'checkremove'+ area.id.to_s %>
-                      <%= area.name %>
-                    </span>
-
-                  <% end %>
-              </table>
+<table width="100%">
+  <col width="33%">
+  <col width="67%">
+  <tr>
+    <td>
+      <div class="select_box_wrapper" style="height: 156px; margin-top:4px; margin-left: -8px; ">
+        <h3>Objectives / desired work</h3>
+        <div style="position: relative">
+          <%= form_tag set_objective_path(user), method: "post" do %>
+            <%= text_area_tag :text, user.last_objective, size: "50x6", :id => "objective", :style => "width: 98%;", :class => "small_button1"%>
+            <div class="bottom_right">
+              <button class="small_button" type="button" style="width: 50px; margin-right: 0px" onclick="clear_objective()">Clear</button>
+              <%= submit_tag "Submit", :class =>"small_button", :style => "width: 70px" %>
             </div>
-            <%= submit_tag "Remove area(s)", :class =>"small_button" %>
-          </div>
-        </td>
+          <% end %>
+        </div>
+      </div>
+    </td>
+    <td>
 
-        <td>
-          <div class="select_box_wrapper" style="height: 116px; border-width: 2px" >
-            <h3 >Other possible areas</h3>
-            <div class="select_box_list" style="height: 60px">
-              <table>
-                <col width="50%">
-                <col width="50%">
-                <% Area.order(:name).all.each do |area| %>
-                  <% if !user.areas.include?(area) %>
-                    <span style="white-space: nowrap;">
-                      <%= check_box_tag 'checkadd'+ area.id.to_s %>
-                      <%= area.name %>
-                    </span>
-                  <% end %>
-                <% end %>
-              </table>
-            </div>
-            <%= submit_tag "Add area(s)", :class =>"small_button" %>
-          </div>
-        </td>
-      </tr>
-    </table>
-  <% end %>
-</div>
+      <div class="select_box_wrapper" style="height: 156px; margin-top:4px; margin-right: -8px">
+        <h3>Areas of interest</h3>
+        <%= form_tag amend_aois_path(user), method: "post" do %>
+          <table width="100%">
+            <col width="50%">
+            <col width="50%">
+            <tr>
+              <td>
+
+                <div class="select_box_wrapper" style="height: 116px; border-width: 2px">
+                  <h3>Your areas of interest</h3>
+
+                  <div class="select_box_list" style="height: 60px">
+                    <table>
+                      <col width="50%">
+                      <col width="50%">
+                        <% user.areas.order(:name).each do |area| %>
+                          <span style="white-space: nowrap;">
+                            <%= check_box_tag 'checkremove'+ area.id.to_s %>
+                            <%= area.name %>
+                          </span>
+
+                        <% end %>
+                    </table>
+                  </div>
+                  <%= submit_tag "Remove area(s)", :class =>"small_button" %>
+                </div>
+              </td>
+
+              <td>
+                <div class="select_box_wrapper" style="height: 116px; border-width: 2px;" >
+                  <h3 >Other possible areas</h3>
+                  <div class="select_box_list" style="height: 60px">
+                    <% Area.order(:name).all.each do |area| %>
+                      <% if !user.areas.include?(area) %>
+                        <span style="white-space: nowrap;">
+                          <%= check_box_tag 'checkadd'+ area.id.to_s %>
+                          <%= area.name %>
+                        </span>
+                      <% end %>
+                    <% end %>
+                  </div>
+                  <%= submit_tag "Add area(s)", :class =>"small_button" %>
+                </div>
+              </td>
+            </tr>
+          </table>
+        <% end %>
+      </div>
+    </td>
+  </tr>
+</table>
+
+
+
 
 <div class="select_box_wrapper" style="margin-top: 4px">
   <h3>History</h3>

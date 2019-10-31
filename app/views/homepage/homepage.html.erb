@@ -31,15 +31,21 @@
 <div style ="display: inline-flex; flex-direction: row" >
   <%= button_to "Users", users_path, :method => :get, :class => "large_button make_button" %>
   <%= button_to "Capacity codes", capacitycodes_path, :method => :get, :class => "large_button make_button"  %>
-  <%= button_to "Locations", locations_path, :method => :get, :class => "large_button make_button"  %>
+  <%= button_to "Groups", groups_path, :method => :get, :class => "large_button make_button"  %>
   <%= button_to "Departments", departments_path, :method => :get, :class => "large_button make_button"  %>
+  <%= button_to "Locations", locations_path, :method => :get, :class => "large_button make_button"  %>
   <%= button_to "Areas", areas_path, :method => :get, :class => "large_button make_button"  %>
 
-  <div class="large_button" style="width: 250px; line-height:60px">
-
+  <div class="large_button" style="width: 200px; height: 35px; line-height:60px margin-top: 2px">
     <%= form_tag set_allow_cheat_logon_path(), method: "post", id: "form_cheat_login" do %>
-      Allow cheat login <%= check_box_tag :cheat_logon, "1", $allow_cheatlogon, {:onchange => "form_cheat_login.submit();", :style => "width: 20px; height: 20px" }%>
+      <div class="flex_row" style="margin-top: -10px">
+        <div style="margin-top: -4px"> Allow cheat login </div><%= check_box_tag :cheat_logon, "1", $allow_cheatlogon, {:onchange => "form_cheat_login.submit();", :style => "margin-left: 10px; width: 18px; height: 18px" }%>
+      </div>
     <% end %>
+  </div>
+
+  <div >
+    <%= render "groups" %>
   </div>
 
 

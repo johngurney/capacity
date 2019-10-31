@@ -32,7 +32,7 @@
 
             Cheat login<br/>
             <%= form_tag  cheat_log_in_path, id: "cheat_login" do %>
-              <%= select_tag :user, options_for_select(User.all.order(:last_name, :first_name).map{|user| [user.name, user.id]}, "") , {:class=> "input", :onchange => "cheat_login.submit();", :include_blank => 'Please choose',  :class=>"small_button", :style => "width:150px;"} %>
+              <%= select_tag :user, options_for_select(User.all.order(:last_name, :first_name).map{|user| [user.name, user.id]}, "") , {:onchange => "cheat_login.submit();", :include_blank => 'Please choose',  :class=>"small_button", :style => "width:150px;"} %>
             <% end %>
           <% end %>
           <%= button_to "Log off", log_out_path, :class => "small_button"  %>

@@ -19,6 +19,9 @@ class HomepageController < ApplicationController
       render 'partner_homepage'
       return
     end
+    puts "************ **********"
+
+
     @non_absent_users = get_users(false)
     @absent_users = get_users(true)
     get_emails
@@ -73,12 +76,25 @@ class HomepageController < ApplicationController
 
   def get_users(is_asbent)
      users = []
-     User.all.each do |user|
-       log = user.capacity_log
-       users << {:user => user, :capacity_log => log, :capacity_number => (log.blank? ? 0 : log.capacity_number) } if user.user_type == "User" && user.check_search_criteria(@included_areas, @included_departments, @included_locations) && ((log.present? and log.absent) ^ !is_asbent) # ^ is xor
+     # User.all.each do |user|
+     #   log = user.capacity_log
+     #   users << {:user => user, :capacity_log => log, :capacity_number => (log.blank? ? 0 : log.capacity_number) } if user.user_type == "User" && user.check_search_criteria(@included_areas, @included_departments, @included_locations) && ((log.present? and log.absent) ^ !is_asbent) # ^ is xor
+     # end
+
+     user = logged_in_user_helper
+
+     user.groups.each do |group|
+       if Groupuserlookup.where(:user_id => user.id, :group_id => group.id).first.selected
+         group.users.each do |user|
+           log = user.capacity_log
+           if user.user_type == "User" && user.check_search_criteria(@included_areas, @included_departments, @included_locations) && ((log.present? and log.absent) ^ !is_asbent) # ^ is xor
+             users << {:user => user, :capacity_log => log, :capacity_number => (log.blank? ? 0 : log.capacity_number) }
+           end
+         end
+       end
      end
 
-     puts "Users " + users.count.to_s
+     users.uniq!
 
      users.sort_by {|user| [user[:capacity_number], user[:user][:last_name], user[:user][:first_name]] }
 
@@ -106,38 +122,46 @@ class HomepageController < ApplicationController
 
   def test
 
-    user = User.where(:last_name => "Cross").first
-
-    Capacitylog.delete_all
-
-    prng = Random.new
-    date = Date.today
-    capacity_number = 3
-
-    (1..30).each do |n|
-
-      capacity_number += + rand(3) - 1
-
-      if capacity_number > 4
-        capacity_number = 4
-      elsif capacity_number < 1
-          capacity_number = 1
+    User.all.each do |user|
+      if user.position == "Partner" && user.user_type == "User"
+        user.user_type = "Partner"
+        user.save
       end
-
-      no_days = prng.rand(14).to_i + 2
-      date -= no_days.days
-
-      puts "Date = " + date.to_s
-
-      log = Capacitylog.new
-      log.created_at = date
-      log.capacity_number = capacity_number
-      log.user_id = user.id
-      log.absent = false
-      log.save
-
-
     end
+
+
+    # user = User.where(:last_name => "Cross").first
+    #
+    # Capacitylog.delete_all
+    #
+    # prng = Random.new
+    # date = Date.today
+    # capacity_number = 3
+    #
+    # (1..30).each do |n|
+    #
+    #   capacity_number += + rand(3) - 1
+    #
+    #   if capacity_number > 4
+    #     capacity_number = 4
+    #   elsif capacity_number < 1
+    #       capacity_number = 1
+    #   end
+    #
+    #   no_days = prng.rand(14).to_i + 2
+    #   date -= no_days.days
+    #
+    #   puts "Date = " + date.to_s
+    #
+    #   log = Capacitylog.new
+    #   log.created_at = date
+    #   log.capacity_number = capacity_number
+    #   log.user_id = user.id
+    #   log.absent = false
+    #   log.save
+    #
+    #
+    # end
 
     # User.all.each do |user|
     #   if user.user_type.blank?

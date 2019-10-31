@@ -1,10 +1,18 @@
 class UsersController < ApplicationController
-  before_action :set_user, only: [:show, :edit, :update, :destroy, :capacity_log, :amend_aois, :make_password, :history, :selected_history]
+  before_action :set_user, only: [:show, :edit, :update, :destroy, :capacity_log, :amend_aois, :make_password, :history, :selected_history, :amend_user_groups, :assign_groups, :set_objective]
 
   # GET /users
   # GET /users.json
   def index
-    @users = User.all
+    user = logged_in_user_helper
+    @users = []
+    user.groups.each do |group|
+      @users.concat group.users if group.users.count > 0
+    end
+    @users.uniq!
+    puts @users.to_s
+    @users.sort_by! {|user| [user[:last_name], user[:first_name]] }
+
   end
 
   # GET /users/1
@@ -203,6 +211,61 @@ class UsersController < ApplicationController
     end
     user.save
     redirect_to history_path(@user)
+  end
+
+  def amend_user_groups
+
+    if params[:commit] == "Add group(s)"
+      Group.all.each do |group|
+        @user.groups << group if params["checkadd" + group.id.to_s ] == "1"
+      end
+
+    elsif params[:commit] == "Remove group(s)"
+      Group.all.each do |group|
+        @user.groups.delete(group) if params["checkremove" + group.id.to_s ] == "1" && @user.groups.count > 1
+      end
+    end
+    redirect_to edit_user_path(@user)
+  end
+
+  def assign_groups
+    #This sets the groups to which the logged on user is assigned, that is the ones to which he or  she has access
+    #This can be set only by the administrator
+
+    Group.all.each do |group|
+      if params["checkgroup" + group.id.to_s ] == "1"
+        @user.groups << group if !user.groups.include?(group)
+      else
+        @user.groups.delete(group) << group if user.groups.include?(group) && user.groups.count > 1
+      end
+    end
+
+
+    redirect_to reqest.referer #users_path
+  end
+
+  def select_groups
+    #This sets the groups to which the logged on user has selected, that is the ones to which he or she views as any particiular time
+    #This can be set by the users
+    user = helpers.logged_in_user_helper
+
+    user.groups.each do |group|
+      puts "ground_id" + group.id.to_s + params["checkgroup" + group.id.to_s ].to_s
+      lookup = Groupuserlookup.where(:user_id => user.id, :group_id => group.id).first
+      lookup.selected = params["checkgroup" + group.id.to_s ] == "1"
+      puts "ground_id" + lookup.selected.to_s
+      lookup.save
+    end
+
+    # render "temp"
+
+    redirect_to request.referer #users_path
+
+  end
+
+  def set_objective
+    Objective.create(:text => params[:text], :user_id => @user.id)
+    redirect_to root_path
   end
 
 

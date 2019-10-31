@@ -3,6 +3,11 @@ class User < ApplicationRecord
   belongs_to :department, optional: true
   belongs_to :location, optional: true
 
+  has_many :groupuserlookups
+  has_many :groups, through: :groupuserlookups
+
+  has_many :objectives
+
   def name
     self.first_name.to_s + " " + self.last_name.to_s
   end
@@ -184,5 +189,29 @@ class User < ApplicationRecord
     self[:history_end_date].present? ? self[:history_end_date] :  Date.today
   end
 
+  def group_selected?(group)
+    lookup =  Groupuserlookup.where(:user_id => self.id, :group_id => group.id).first
+    lookup.present? ? lookup.selected : false
+  end
 
+  def groups_stg
+    stg = ""
+    self.groups.each do |group|
+      stg += "; " if stg != ""
+      stg += group.name
+    end
+    stg
+  end
+
+  def multi_selected_groups
+    n = 0
+    self.groups.each do |group|
+      n +=1 if Groupuserlookup.where(:user_id => self.id, :group_id => group.id).first.selected
+    end
+    n > 1
+  end
+
+  def last_objective
+    self.objectives.count == 0 ? "" : self.objectives.order(:created_at).last.text 
+  end
 end

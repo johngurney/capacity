@@ -15,4 +15,3 @@ Rails.application.config.assets.paths << Rails.root.join('node_modules')
 
 filename = Rails.root.join("public", "cheat_log_in")
 $allow_cheatlogon = File.exist?(filename)
-puts "allow_cheatlogon" + $allow_cheatlogon.to_s 
