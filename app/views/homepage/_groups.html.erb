@@ -1,8 +1,29 @@
+<script>
+  var check_groups = [<%= get_all_ids(logged_in_user_helper.effective_groups) %>];
+  function check_groups_on_off(v) {
+    check_groups.forEach (function(cb) {
+      document.getElementById("checkgroup"+cb).checked = v;
+    })
+  }
+</script>
+
+<style>
+
+  .bottom_right {
+    position: absolute;
+    bottom: 0px;
+    right: 4px;
+  }
+
+</style>
+
+
+
 <% if logged_in_user_helper.groups.count > 1 %>
-  <div class="select_box_wrapper" style="height: 60px; width: 250px; border-width: 2px">
+  <div class="select_box_wrapper" style="height: 60px; width: 300px; border-width: 2px; position: relative;">
     <%= form_tag select_groups_path, method: "post" do %>
-      <div class="select_box_list" style="height: 30px">
-        <% logged_in_user_helper.groups.order(:name).each do |group| %>
+      <div class="select_box_list" style="height: 40px">
+        <% logged_in_user_helper.effective_groups.order(:name).each do |group| %>
           <span style="white-space: nowrap; margin-right:15px">
             <%= check_box_tag 'checkgroup'+ group.id.to_s, "1", logged_in_user_helper.group_selected?(group) %>
             <%= group.name %>
@@ -10,7 +31,14 @@
 
         <% end %>
       </div>
-      <%= submit_tag "Update", :class => "small_button", :style => "width:60px; height: 20px" %>
+
     <% end %>
+    <div class="bottom_right" >
+      <div class="flex_row" style="height: auto;">
+        <%= submit_tag "Update", :class => "small_button", :style => "width:60px; height: 20px" %>
+        <button class="very_small_button" type="button" onclick="check_groups_on_off(true)">All on</button>
+        <button class="very_small_button" type="button" onclick="check_groups_on_off(false)">All off</button>
+      </div>
+    </div>
   </div>
 <% end %>

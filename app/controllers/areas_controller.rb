@@ -24,17 +24,12 @@ class AreasController < ApplicationController
   # POST /areas
   # POST /areas.json
   def create
-    @area = Area.new(area_params)
 
-    respond_to do |format|
-      if @area.save
-        format.html { redirect_to @area, notice: 'Area was successfully created.' }
-        format.json { render :show, status: :created, location: @area }
-      else
-        format.html { render :new }
-        format.json { render json: @area.errors, status: :unprocessable_entity }
-      end
-    end
+    @area = Area.new(area_params)
+    @aresa.group_id = logged_in_user_helper.first_selected_group.id
+    @area.save
+
+    redirect_to areas_path
   end
 
   # PATCH/PUT /areas/1
@@ -74,6 +69,7 @@ class AreasController < ApplicationController
         if Area.where("lower(name) = ?", line.downcase).count == 0
           area = Area.new
           area.name = line
+          area.group_id = logged_in_user_helper.first_selected_group.id
           area.save
         end
       end

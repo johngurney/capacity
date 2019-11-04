@@ -1,0 +1,34 @@
+<% title ||= " " %>
+<% tag ||= "file" %>
+<% name ||= " " %>
+<% height ||= 80 %>
+<% class_name ||= "select_box_wrapper" %>
+<% file_type ||= ".jpg" %>
+
+
+<div class="flex_row <%= class_name %>" style="height: <%= height %>px; width: auto; padding: 0px">
+  <div class="flex_col" style="width: 0; height: 100%; padding: 0px">
+    <div style="font-weight: bold; font-size: 12px; white-space:nowrap; margin-left:10px">
+      <%= title %>
+    </div>
+  </div>
+  <div class="flex_col" style="height: 100%; justify-content: center">
+    <div style="margin: 10px">
+      <label for="<%= name %>_file-upload" class="make_button small_button">Browse</label>
+      <%= file_field_tag(tag , {:accept => file_type, :id => name + "_file-upload", :onchange=> ("file_field_tag_browse_click(\'" + name + "_\')").html_safe }) %>
+    </div>
+  </div>
+  <div class="flex_col" style="height: 100%; justify-content: center; padding: 0px">
+
+    <div id="<%= name %>_file_field_path_div" class="small_button flex_col" style="height: 60px; max-height: 60px; background: lightgray; display: none;">
+      <label class="file_field_tag_filename" >Selected filename</label>
+      <label id="<%= name %>_file_field_path_label" class="file_field_tag_filepath" >testtest.txt </label>
+    </div>
+
+  </div>
+  <div class="flex_col" style="height: 100%; justify-content: center; padding: 0px">
+    <div>
+      <%= submit_tag "Upload",  {:id => name + "_file_field_upload", :class => "make_button small_button", :style => "display: none"} %>
+    </div>
+  </div>
+</div>

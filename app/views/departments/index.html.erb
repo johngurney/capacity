@@ -2,6 +2,10 @@
 
 <h1>Departments</h1>
 
+<%= form_tag  select_group_for_logged_in_user_path, id: "select_group" do %>
+  Select group <%= select_tag :group, options_for_select(Group.all.order(:name).map{|group| [group.name, group.id]}, logged_in_user_helper.first_selected_group.id) , {:onchange => "select_group.submit();",  :class=>"small_button", :style => "width:150px;"} %>
+<% end %>
+
 <table>
   <thead>
     <tr>
@@ -11,7 +15,7 @@
   </thead>
 
   <tbody>
-    <% @departments.each do |department| %>
+    <% @departments.where(:group_id => logged_in_user_helper.first_selected_group.id).order(:name).each do |department| %>
       <tr>
         <td><%= department.name %></td>
         <td><%= link_to 'Show', department %></td>
@@ -24,4 +28,11 @@
 
 <br>
 
-<%= link_to 'New Department', new_department_path %>
+<div class="flex_row" >
+  <%= button_to 'New department', new_department_path, :method => :get, :class => "small_button" %>
+</div>
+<div class="flex_row" >
+    <%= form_tag upload_depts_file_path, :multipart => true do  %>
+    <%= render "file_tag", title: "Upload file", name: "areas", tag: :file, class_name: "standard_button", height: 60, file_type: ".txt" %>
+  <% end %>
+</div>

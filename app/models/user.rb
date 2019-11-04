@@ -67,6 +67,19 @@ class User < ApplicationRecord
 
   end
 
+  def capacity_stg
+    log = self.capacity_log
+    puts "log =" + log.capacity_number.to_s
+    log.capacity_number.to_s + ( log.comment.blank? || log.comment == "" ? "" : " - " + log.comment) if log.present?
+
+  end
+
+  def objective_stg
+    objective = Objective.where(:user_id => self.id).order(:created_at)
+    return objective.last.text.to_s if objective.count > 0
+  end
+
+
   def department_name
     self.department.blank? ? "" : self.department.name
   end
@@ -99,6 +112,8 @@ class User < ApplicationRecord
     stg
 
   end
+
+
 
   def capacity_xs(start_date, end_date)
     stg = ""
@@ -158,27 +173,12 @@ class User < ApplicationRecord
 
   end
 
-  def months(start_date, end_date)
-    if end_date > start_date
-
-      months_between = (end_date.year * 12 + end_date.month) - (start_date.year * 12 + start_date.month) + 1
-      months_per_entry = (months_between.to_d / 12).ceil(0)
-
-      date = start_date.beginning_of_month
-      stg = ""
-      while date < end_date do
-        stg += ", " if stg != ""
-        stg += "\"" + date.strftime("%b %y") + "\""
-        (1..months_per_entry).each do
-          date = date.next_month
-        end
-      end
-      stg
-    end
-  end
-
   def is_admin?
     !self.user_type.blank? && (self.user_type == "Administrator")
+  end
+
+  def is_user?
+    !self.user_type.blank? && (self.user_type == "User")
   end
 
   def history_start_date
@@ -194,6 +194,24 @@ class User < ApplicationRecord
     lookup.present? ? lookup.selected : false
   end
 
+  def first_selected_group
+    #NB this should be called only by (a) the logged_on_user (b) which is an Administrator
+    if self.groups.empty?
+      #There should always be at least one group for the user, but this is just in case there isn't
+
+      self.groups << Group.all.order(:name).first
+      group = self.groups.first
+      self.set_selected(group, true)
+      group
+    else
+      self.groups.order(:name).each do |group|
+        if self.selected(group)
+          return group
+        end
+      end
+    end
+  end
+
   def groups_stg
     stg = ""
     self.groups.each do |group|
@@ -203,15 +221,87 @@ class User < ApplicationRecord
     stg
   end
 
+  def set_selected(group, value)
+    lookups = Groupuserlookup.where(:user_id => self.id, :group_id => group.id)
+    if lookups.empty?
+      Groupuserlookup.create(:user_id => self.id, :group_id => group.id, :selected => true)
+      return
+    elsif logs.count > 1
+      lookups.all[1..-1].delete_all if lookups.count > 1
+    end
+    lookup = lookups.first
+    lookup.selected = value
+    lookup.save
+  end
+
+  def selected(group)
+    if self.groups.count == 1
+      true
+    else
+      logs = Groupuserlookup.where(:user_id => self.id, :group_id => group.id)
+      logs.first.selected if !logs.empty?
+    end
+  end
+
+
+  def effective_groups
+    if self.user_type == "Administrator"
+      Group.all
+    else
+      self.groups
+    end
+  end
+
   def multi_selected_groups
     n = 0
     self.groups.each do |group|
-      n +=1 if Groupuserlookup.where(:user_id => self.id, :group_id => group.id).first.selected
+      n +=1 if self.selected(group)
     end
     n > 1
   end
 
   def last_objective
-    self.objectives.count == 0 ? "" : self.objectives.order(:created_at).last.text 
+    self.objectives.count == 0 ? "" : self.objectives.order(:created_at).last.text
   end
+
+  def get_create_group_lookup(group)
+    lookups = Groupuserlookup.where(:user_id => self.id, :group_id => group.id)
+
+    if lookups.count == 0
+      Groupuserlookup.create(:user_id => self.id, :group_id => group.id)
+      return
+    elsif lookups.count > 0
+      #Delete all duplicate entries (ie those other than the first).  This is just housekeeping, it should never be required
+      lookups.all[1..-1].delete_all if lookups.count > 1
+    end
+    lookups.first
+
+  end
+
+  def areas_of_selected_groups
+    areas = []
+    groups = self.effective_groups
+    groups.order(:name).each do |group|
+      if self.selected(group)
+        group.areas.order(:name).each do |area|
+          areas << area
+        end
+      end
+    end
+    areas
+  end
+
+  def depts_of_selected_groups
+    depts = []
+    groups = self.effective_groups
+    groups.order(:name).each do |group|
+      if self.selected(group)
+        group.departments.order(:name).each do |dept|
+          depts << dept
+        end
+      end
+    end
+    depts
+  end
+
 end

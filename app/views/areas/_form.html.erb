@@ -11,12 +11,16 @@
     </div>
   <% end %>
 
-  <div class="field">
+  <%= form_tag  select_group_for_logged_in_user_path, id: "select_group" do %>
+    Select group <%= select_tag :group, options_for_select(Group.all.order(:name).map{|group| [group.name, group.id]}, logged_in_user_helper.first_selected_group.id) , {:onchange => "select_group.submit();",  :class=>"small_button", :style => "width:150px;"} %>
+  <% end %>
+
+  <div class="flex_row" style="margin-top: 40px;">
     <%= form.label :name %>
-    <%= form.text_field :name %>
+    <%= form.text_field :name, :class => "small_button", :style => "text-align: left; width: 250px; padding-left:5px; margin-left: 40px;" %>
   </div>
 
   <div class="actions">
-    <%= form.submit %>
+    <%= form.submit "Ok", :class=>"small_button" %>
   </div>
-<% end %>
+<<% end %>

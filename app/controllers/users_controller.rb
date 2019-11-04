@@ -1,5 +1,5 @@
 class UsersController < ApplicationController
-  before_action :set_user, only: [:show, :edit, :update, :destroy, :capacity_log, :amend_aois, :make_password, :history, :selected_history, :amend_user_groups, :assign_groups, :set_objective]
+  before_action :set_user, only: [:show, :edit, :update, :destroy, :capacity_log, :amend_aois, :make_password, :history, :selected_history, :amend_user_groups, :assign_groups, :set_objective, :set_group_for_user]
 
   # GET /users
   # GET /users.json
@@ -7,7 +7,9 @@ class UsersController < ApplicationController
     user = logged_in_user_helper
     @users = []
     user.groups.each do |group|
-      @users.concat group.users if group.users.count > 0
+      if user.selected(group)
+        @users.concat group.users if group.users.count > 0
+      end
     end
     @users.uniq!
     puts @users.to_s
@@ -40,15 +42,13 @@ class UsersController < ApplicationController
     @user.department = Department.find( params[:user][:department].to_i )
     @user.location = Location.find( params[:user][:location].to_i )
 
-    respond_to do |format|
-      if @user.save
-        format.html { redirect_to @user, notice: 'User was successfully created.' }
-        format.json { render :show, status: :created, location: @user }
-      else
-        format.html { render :new }
-        format.json { render json: @user.errors, status: :unprocessable_entity }
-      end
+    @user.save
+    logged_in_user_helper.groups.each do |group|
+      @user.groups << group
     end
+
+    redirect_to @user
+
   end
 
   # PATCH/PUT /users/1
@@ -209,6 +209,9 @@ class UsersController < ApplicationController
         user.history_end_date = @user.history_start_date.next_year - 1
       end
     end
+    logged_in_user_helper.groups.each do |group|
+      user.groups << group
+    end
     user.save
     redirect_to history_path(@user)
   end
@@ -240,20 +243,26 @@ class UsersController < ApplicationController
       end
     end
 
-
     redirect_to reqest.referer #users_path
   end
 
   def select_groups
-    #This sets the groups to which the logged on user has selected, that is the ones to which he or she views as any particiular time
-    #This can be set by the users
+    #This applies only to partners and administrators
+    #This sets the groups to which the logged_on_user has selected, that is the ones to which he or she views as any particiular time
+    #This can be set by the user
     user = helpers.logged_in_user_helper
 
-    user.groups.each do |group|
-      puts "ground_id" + group.id.to_s + params["checkgroup" + group.id.to_s ].to_s
+    #For an administrator user.effective_groups = Group.all, for a partner user.effective_groups = user.groups
+    user.effective_groups.each do |group|
+
       lookup = Groupuserlookup.where(:user_id => user.id, :group_id => group.id).first
+      if lookup.blank?
+        user.groups << group
+        lookup = Groupuserlookup.where(:user_id => user.id, :group_id => group.id).first
+      end
+
       lookup.selected = params["checkgroup" + group.id.to_s ] == "1"
-      puts "ground_id" + lookup.selected.to_s
+
       lookup.save
     end
 
@@ -268,6 +277,27 @@ class UsersController < ApplicationController
     redirect_to root_path
   end
 
+  def set_group_for_user
+    group  = Group.find(params[:group].to_i)
+    if group.present?
+      @user.groups.delete_all
+      @user.groups << group
+
+      puts "+++++++++" + group.id.to_s
+
+    end
+    redirect_to request.referer
+
+  end
+
+  def select_group_for_logged_in_user
+    logged_in_user_helper.effective_groups.each do |group|
+      lookup = logged_in_user_helper.get_create_group_lookup(group)
+      lookup.selected = (params[:group].to_i == group.id)
+      lookup.save
+    end
+    redirect_to request.referer
+  end
 
   private
     # Use callbacks to share common setup or constraints between actions.

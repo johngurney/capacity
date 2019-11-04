@@ -11,12 +11,12 @@
     </div>
   <% end %>
 
-  <div class="field">
+  <div class="flex_row" style="margin-top: 40px;">
     <%= form.label :name %>
-    <%= form.text_field :name %>
+    <%= form.text_field :name, :class => "small_button", :style => "text-align: left; width: 250px; padding-left:5px; margin-left: 40px;" %>
   </div>
 
   <div class="actions">
-    <%= form.submit %>
+    <%= form.submit "Ok", :class=>"small_button" %>
   </div>
 <% end %>

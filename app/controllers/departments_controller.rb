@@ -25,16 +25,12 @@ class DepartmentsController < ApplicationController
   # POST /departments.json
   def create
     @department = Department.new(department_params)
+    @department.group_id = logged_in_user_helper.first_selected_group.id
 
-    respond_to do |format|
-      if @department.save
-        format.html { redirect_to @department, notice: 'Department was successfully created.' }
-        format.json { render :show, status: :created, location: @department }
-      else
-        format.html { render :new }
-        format.json { render json: @department.errors, status: :unprocessable_entity }
-      end
-    end
+    @department.save
+
+    redirect_to departments_path
+
   end
 
   # PATCH/PUT /departments/1
@@ -60,6 +56,30 @@ class DepartmentsController < ApplicationController
       format.json { head :no_content }
     end
   end
+
+
+  def upload_file
+
+    uploaded_io = params[:file]
+
+    if uploaded_io.present?
+
+      text = uploaded_io.read
+
+      text.each_line do |line|
+        line.gsub!("\r\n", '')
+        if Department.where(:group_id => logged_in_user_helper.first_selected_group.id).where("lower(name) = ?", line.downcase).count == 0
+          dept = Department.new
+          dept.name = line
+          dept.group_id = logged_in_user_helper.first_selected_group.id
+          dept.save
+        end
+      end
+    end
+
+    redirect_to departments_path
+  end
+
 
   private
     # Use callbacks to share common setup or constraints between actions.

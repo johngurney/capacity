@@ -1,5 +1,9 @@
-<h1>New Department</h1>
+<h1>New department</h1>
+
+<%= form_tag  select_group_for_logged_in_user_path, id: "select_group" do %>
+  Select group <%= select_tag :group, options_for_select(Group.all.order(:name).map{|group| [group.name, group.id]}, logged_in_user_helper.first_selected_group.id) , {:onchange => "select_group.submit();",  :class=>"small_button", :style => "width:150px;"} %>
+<% end %>
 
 <%= render 'form', department: @department %>
 
-<%= link_to 'Back', departments_path %>
+<%= link_to 'All departments', departments_path %>

@@ -41,6 +41,7 @@
 
 <% user = logged_in_user_helper %>
 <h1>User home page for <%= user.name %></h1>
+<h1>You are in <%= user.groups.first.name %></h1>
 <% if Capacitylog.where(:user_id => user.id).count > 0 %>
   <% log = Capacitylog.where(:user_id => user.id).order(:created_at).last %>
   <h2 style="color: orange; margin-bottom: 0px";>Current capacity: <%= log.capacity_number.to_s %> - logged at <%= log.created_at.strftime("%d %b %Y at %H:%M") %></h2>
@@ -173,7 +174,7 @@
                 <div class="select_box_wrapper" style="height: 116px; border-width: 2px;" >
                   <h3 >Other possible areas</h3>
                   <div class="select_box_list" style="height: 60px">
-                    <% Area.order(:name).all.each do |area| %>
+                    <% Area.where(:group_id => user.groups.first.id).order(:name).all.each do |area| %>
                       <% if !user.areas.include?(area) %>
                         <span style="white-space: nowrap;">
                           <%= check_box_tag 'checkadd'+ area.id.to_s %>

@@ -17,7 +17,7 @@
       <col width="25%">
       <tr>
         <td>
-          <% if !(logged_in_user_helper).blank? && logged_in_user_helper.user_type == "Administrator" then %>
+          <% if !(logged_in_user_helper).blank? && logged_in_user_helper.user_type != "User" then %>
             <%= link_to "Home", root_path %>
           <% end %>
         </td>
@@ -36,6 +36,7 @@
             <% end %>
           <% end %>
           <%= button_to "Log off", log_out_path, :class => "small_button"  %>
+          <%= button_to "Reset cookie consent", reset_cookie_consent_path, :class => "small_button"  %>
           <% if !(logged_in_user_helper).blank? && logged_in_user_helper.user_type == "Administrator" then %>
             <%= button_to "Test", test_path, :class=>"small_button" %>
             <%= button_to "Delete all", delete_all_path, :class=>"small_button" %>

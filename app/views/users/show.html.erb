@@ -2,35 +2,16 @@
   <col width="30%">
   <col width="70%">
   <tr>
-    <td>First name</td>
-    <td><%= @user.first_name  %></td>
+    <td>Name</td>
+    <td><%= @user.name  %></td>
   </tr>
   <tr>
-    <td>Last name</td>
-    <td><%= @user.last_name  %></td>
+    <td>Capacity</td>
+    <td><%= @user.capacity_stg  %></td>
   </tr>
   <tr>
-    <td>User type</td>
-    <td><%= @user.user_type %></td>
-  <tr>
-    <td>Position</td>
-    <td><%= @user.position  %></td>
-  </tr>
-  <tr>
-    <td>Department</td>
-    <td><%= @user.department_name  %></td>
-  </tr>
-  <tr>
-    <td>Location</td>
-    <td><%= @user.location_name  %></td>
-  </tr>
-  <tr>
-    <td>Telephone</td>
-    <td><%= link_to @user.telephone, "tel:" + @user.telephone %></td>
-  </tr>
-  <tr>
-    <td>Email address</td>
-    <td><%= mail_to @user.email , nil , subject: "Capacity query" , body: "Do you have any capacity for  new matter?" %></td>
+    <td>Objectives / comments</td>
+    <td><%= @user.objective_stg  %></td>
   </tr>
   <tr>
     <td>Areas of interest</td>
@@ -40,9 +21,51 @@
       <% end %>
 
     </td>
+
+    <tr>
+      <td></td>
+    </tr>
+
+  <tr>
+    <td>User type</td>
+    <td><%= @user.user_type %></td>
+  </tr>
+
+  <tr>
+    <td>Position</td>
+    <td><%= @user.position  %></td>
+  </tr>
+  <tr>
+    <td><%= "Group".pluralize(@user.groups.count)%></td>
+    <td><%= @user.groups_stg %></td>
+  </tr>
+  <tr>
+    <td>Department</td>
+    <td><%= @user.department_name  %></td>
+  </tr>
+  <tr>
+    <td>Location</td>
+    <td><%= @user.location_name  %></td>
+  </tr>
+
+  <tr>
+    <td></td>
+  </tr>
+
+  <tr>
+    <td>Telephone</td>
+    <td><%= link_to @user.telephone, "tel:" + @user.telephone %></td>
+  </tr>
+  <tr>
+    <td>Email address</td>
+    <td><%= mail_to @user.email , nil , subject: "Capacity query" , body: "Do you have any capacity for  new matter?" %></td>
+  </tr>
   </tr>
 </table>
-<%= button_to "Capacity history", history_path(@user), :method => :get, :class => "small_button" %>
+
+<% if @user.is_user? %>
+  <%= button_to "Capacity history", history_path(@user), :method => :get, :class => "small_button", :style => "margin-top: 20px" %>
+<% end %>
 <div style ="display: inline-flex; flex-direction: row" >
   <% if logged_in_user_helper.present? && logged_in_user_helper.is_admin? %>
     <%= button_to "Users", users_path, :method => :get, :class => "small_button" %>

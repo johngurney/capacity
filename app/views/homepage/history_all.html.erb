@@ -1,3 +1,4 @@
+
 <script type="text/javascript">
 
   var RADIUS = 3;
@@ -12,9 +13,9 @@
   function update_charts() {
 
       months = [<%= months(logged_in_user_helper.history_start_date.to_datetime, logged_in_user_helper.history_end_date.to_datetime).html_safe %>];
-      xs = [<%= @user.capacity_xs(logged_in_user_helper.history_start_date.to_datetime, logged_in_user_helper.history_end_date.to_datetime) %> ];
-      ys = [<%= @user.capacity_ys(logged_in_user_helper.history_start_date.to_datetime, logged_in_user_helper.history_end_date.to_datetime) %> ];
-      var average_value = [<%= @user.average_capacity(logged_in_user_helper.history_start_date.to_datetime, logged_in_user_helper.history_end_date.to_datetime) %>];
+      xs = [<%= all_capacity_xs(logged_in_user_helper.history_start_date.to_datetime, logged_in_user_helper.history_end_date.to_datetime) %> ];
+      ys = [<%= all_capacity_ys(logged_in_user_helper.history_start_date.to_datetime, logged_in_user_helper.history_end_date.to_datetime) %> ];
+      var average_value = [<%= all_average_capacity(logged_in_user_helper.history_start_date.to_datetime, logged_in_user_helper.history_end_date.to_datetime) %>];
 
 
       var c = document.getElementById("capacity_canvas");
@@ -88,7 +89,7 @@
 
       ctx.font = "20px Arial";
       ctx.textAlign = "left";
-      ctx.fillText("Capacity history for <%= @user.name %>", c.width * .02, c.height * .06 );
+      ctx.fillText("Capacity history for xx", c.width * .02, c.height * .06 );
       ctx.font = "10px Arial";
       ctx.fillStyle = "red";
       // ctx.strokeStyle = "red";
@@ -111,8 +112,22 @@
 </script>
 <%= @test %>
 <h1>History</h1>
+
+<div class="select_box_wrapper" style="height: 150px; margin-bottom: 20px">
+  <h3>Users</h3>
+  <div class="select_box_list" style="height: 100px">
+    <% @users.each do |user| %>
+      <span style="white-space: nowrap;">
+        <%= check_box_tag 'check'+ user[:user].id.to_s, 1, true %>
+        <%= user[:user].name %>
+      </span>
+    <% end %>
+  </div>
+  xx
+</div>
+
 <canvas id="capacity_canvas" width="700" height="500" style="border:1px solid #000000; background-color:white; "></canvas>
-<%= form_tag selected_history_path, method: "get", id: "selected_history" do %>
+<%= form_tag root_path, method: "get", id: "selected_history" do %>
 <div style ="display: inline-flex; flex-direction: row; align-items: center" >
   Start date
   <%= date_field_tag :start_date, logged_in_user_helper.history_start_date.strftime("%Y-%m-%d"), :class=>"small_button" %>

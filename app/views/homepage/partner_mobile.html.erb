@@ -1,0 +1,157 @@
+<script type="text/javascript">
+
+  var emails, checkboxes;
+  checkboxes = <%= @checkboxes %>;
+
+  function send_email() {
+    <% if @emails %>
+    emails = <%= @emails.html_safe %>;
+    <% end %>
+    var stg = "";
+    n = 0;
+    checkboxes.forEach (function(user_id) {
+      if (document.getElementById("checkbox" + user_id).checked)
+      {
+        stg += emails[n] + "; ";
+      }
+      n += 1;
+    })
+    window.open("mailto:" + stg );
+  }
+
+  function check_box_click(){
+    var flag = false;
+    checkboxes.forEach (function(user_id) {
+      if (document.getElementById("checkbox" + user_id).checked)
+      {
+        flag = true;
+      }
+    })
+    if (flag) {
+      document.getElementById("send_email_button").style.display = "block";
+    } else {
+      document.getElementById("send_email_button").style.display = "none";
+    }
+  }
+
+  var check_areas = [<%= get_all_ids(logged_in_user_helper.areas_of_selected_groups) %>];
+  var check_locations = [<%= get_all_ids(Location.all)%>];
+  var check_departments = [<%= get_all_ids(logged_in_user_helper.depts_of_selected_groups) %>];
+
+  function check_areas_on_off(v) {
+    check_areas.forEach (function(cb) {
+      document.getElementById("check_area"+cb).checked = v;
+    })
+  }
+
+  function check_departments_on_off(v) {
+    check_departments.forEach (function(cb) {
+      document.getElementById("check_department"+cb).checked = v;
+    })
+  }
+
+  function check_locations_on_off(v) {
+    check_locations.forEach (function(cb) {
+      document.getElementById("check_location"+cb).checked = v;
+    })
+  }
+
+</script>
+
+<button id="send_email_button" onclick="send_email();" class="small_button" style="width: 200px; display: none">Send email to all selected users</button>
+
+<h2>Non absent users</h2>
+
+<% multi_groups_flag = logged_in_user_helper.multi_selected_groups %>
+
+<table width="100%" >
+  <col width="40%">
+  <col width="10%">
+  <col width="10%">
+  <col width="40%">
+  <tr style="font-weight: bold">
+    <td>
+      Name
+    </td>
+    <td>
+      Email
+    </td>
+    <td>
+      Capacity
+    </td>
+    <td>
+      Comments / <scan style="color:red">objectives / desired work</scan>
+    </td>
+  </tr>
+  <% if @non_absent_users %>
+    <% @non_absent_users.each do |user| %>
+    <tr >
+      <td>
+        <%= link_to user[:user].name, user_path(user[:user]) %>
+      </td>
+      <td>
+        <input type="checkbox" id="checkbox<%= user[:user].id.to_s %>" style="width: 20px; height: 20px" name="user" onchange="check_box_click()"></td>
+      </td>
+      <td>
+        <%= user[:capacity_number] %><% if user[:capacity_number] != 0 %> - <%= Capacitycode.where(:capacity_number => user[:capacity_number]).first.text %><% end %>
+        <% if !user[:capacity_log].blank? %>(Last updated <%= user[:capacity_log].created_at.strftime("%e %b %Y")%>)<% end %>
+
+      </td>
+      <td>
+        <% if !user[:capacity_log].blank? %>
+          <%= user[:capacity_log].comment %>
+        <% end %>
+        <scan style="color:red"><%= user[:user].last_objective %></scan>
+      </td>
+    </tr>
+
+    <% end %>
+  <% end %>
+</table>
+<hr style="width:50%">
+<h2 style="margin-top: 30px">Absent users</h2>
+
+<table width="100%" >
+  <col width="40%">
+  <col width="10%">
+  <col width="10%">
+  <col width="40%">
+  <tr style="font-weight: bold">
+    <td>
+      Name
+    </td>
+    <td>
+      Email
+    </td>
+    <td>
+      Capacity
+    </td>
+    <td>
+      Comments / <scan style="color:red">objectives / desired work</scan>
+    </td>
+  </tr>
+  <% if @absent_users %>
+    <% @absent_users.each do |user| %>
+    <tr >
+      <td>
+        <%= link_to user[:user].name, user_path(user[:user]) %>
+      </td>
+      <td>
+        <input type="checkbox" id="checkbox<%= user[:user].id.to_s %>" style="width: 20px; height: 20px" name="user" onchange="check_box_click()"></td>
+      </td>
+      <td>
+        <%= user[:capacity_number] %><% if user[:capacity_number] != 0 %> - <%= Capacitycode.where(:capacity_number => user[:capacity_number]).first.text %><% end %>
+        <% if !user[:capacity_log].blank? %>(Last updated <%= user[:capacity_log].created_at.strftime("%d %b %Y")%>)<% end %>
+
+      </td>
+      <td>
+        <scan style="color:blue"><% if user[:capacity_log].present? && user[:capacity_log].return_date.present? %>Return date: <%= user[:capacity_log].return_date.strftime("%e %b %Y")%><% end %></scan>
+        <% if !user[:capacity_log].blank? %>
+          <%= user[:capacity_log].comment %>
+        <% end %>
+        <scan style="color:red"><%= user[:user].last_objective %></scan>
+      </td>
+    </tr>
+    <% end %>
+  <% end %>
+</table>

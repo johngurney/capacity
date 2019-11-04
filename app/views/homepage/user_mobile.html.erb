@@ -1,0 +1,122 @@
+<script type="text/javascript">
+
+  function capacity_text(value) {
+    <% Capacitycode.all.each do |code| %>
+    if (value==<%= code.capacity_number.to_s%> ){
+      document.getElementById("details").innerHTML = "<%= code.text %>";
+      return true;
+
+    }
+    <% end %>
+  }
+
+  function set_absent(value) {
+    if (value == 1 ){
+      document.getElementById("return_date1").style.display = "block";
+      document.getElementById("return_date2").style.display = "block";
+      } else {
+        document.getElementById("return_date1").style.display = "none";
+        document.getElementById("return_date2").style.display = "none";
+      }
+      return true;
+    }
+
+    function clear_objective () {
+      document.getElementById("objective").innerHTML = "";
+    }
+
+
+</script>
+
+<style>
+
+  .bottom_right {
+    position: absolute;
+    bottom: 4px;
+    right: 4px;
+  }
+
+</style>
+
+
+<% user = logged_in_user_helper %>
+<h1>User home page for <%= user.name %></h1>
+<h1>You are in <%= user.groups.first.name %></h1>
+<% if Capacitylog.where(:user_id => user.id).count > 0 %>
+  <% log = Capacitylog.where(:user_id => user.id).order(:created_at).last %>
+  <h2 style="color: orange; margin-bottom: 0px";>Current capacity: <%= log.capacity_number.to_s %> - logged at <%= log.created_at.strftime("%d %b %Y at %H:%M") %></h2>
+<br/><br/>
+<% end %>
+
+<div class="select_box_wrapper">
+  <h3>New capacity log</h3>
+
+  <%= form_tag new_capacity_log_path(user), method: "post" do %>
+
+    <table width="80%">
+      <col width="50%">
+      <col width="10%">
+      <col width="40%">
+      <tr>
+        <td>
+          <table width="100%">
+            <col width="25%">
+            <col width="25%">
+            <col width="15%">
+            <col width="35%">
+            <tr>
+              <td>
+                Absent from office
+              </td>
+              <td>
+                <% absent = (!log.blank? and log.absent) %>
+                <%= select_tag :absent, options_for_select([["Absent",1], ["Not absent",0]], (absent ? 1 : 0)), {:class => "small_button", :onchange => "set_absent(this.value);"} %>
+              </td>
+              <td >
+                <div id="return_date1" style="display: <%= absent ? "block" : "none" %>">
+                  Return date
+              </div>
+              </td>
+              <td >
+                <div id="return_date2" style="display: <%= absent ? "block" : "none" %>">
+                  <%= date_field_tag :return_date, (absent) ? log.return_date.strftime("%Y-%m-%d") : Date.today, :class => "small_button"  %>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                Capacity
+              </td>
+              <td>
+                <%= select_tag :capacity_number, options_for_select(Capacitycode.all.order(:capacity_number).map { |code| [code.capacity_number]}, (log.blank? ? 0 : log.capacity_number)), {:id => "selector", :onchange => "capacity_text(this.value)", :include_blank => "Select", :class => "small_button", :style => "text-align-last1: right;" }  %>
+              </td>
+              </td>
+              <td>
+                Details
+              </td>
+              <td>
+                <div id="details" >
+                  <%= log.text if log.present? %>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+            <%= submit_tag "Submit", :class =>"small_button" %>
+              </td>
+            </tr>
+          </table>
+        </td>
+
+        <td>
+          Comments=>
+        </td>
+        <td>
+          <%= text_area_tag :text, "", size: "50x8", :class => "small_button1"%>
+        </td>
+      </tr>
+    </table>
+
+
+  <% end %>
+</div>

@@ -2,14 +2,19 @@
 
 <script>
   var group_ids = <%= (Group.all.map {|group| group.id.to_s}).to_s.html_safe %>;
-  function check_more_than_one_group() {
+  function check_more_than_one_group(event) {
     var count = 0;
     group_ids.forEach(function(n){
       if (document.getElementById("checkgroup" + n).checked) {
         count += 1;
       }
     })
-    alert(count);
+    if (count>1) {
+      if(!confirm("You are adding the user(s) to more than one group.  Is that correct?")){
+        event.preventDefault();
+      }
+    }
+
   }
 
 </script>
@@ -25,9 +30,9 @@
       <table>
       <col width="50%">
       <col width="50%">
-        <% logged_in_user_helper.groups.order(:name).each do |group| %>
+        <% Group.order(:name).each do |group| %>
           <span style="white-space: nowrap; margin-right:15px">
-            <%= check_box_tag 'checkgroup'+ group.id.to_s, "1", logged_in_user_helper.groups.include?(group) %>
+            <%= check_box_tag 'checkgroup'+ group.id.to_s, "1", logged_in_user_helper.selected(group) %>
             <%= group.name %>
           </span>
 
@@ -49,14 +54,14 @@
   <tbody>
     <% @users.each do |user| %>
       <tr>
-        <td><%= user.name %></td>
+        <td><%= link_to user.name, user %></td>
         <td><%= user.user_type %></td>
         <td><%= user.position %></td>
+        <td><%= user.groups_stg %></td>
         <td><%= user.department_name %></td>
         <td><%= user.location_name %></td>
-        <td><%= link_to 'Show', user %></td>
         <td><%= link_to 'Edit', edit_user_path(user) %></td>
-        <td><%= link_to 'Destroy', user, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+        <td><%= link_to 'Delete', user, method: :delete, data: { confirm: 'Are you sure?' } %></td>
       </tr>
     <% end %>
   </tbody>
@@ -67,11 +72,11 @@
 <div class="flex_col" >
 
   <div class="flex_row" >
-    <%= button_to 'New User', new_user_path, :method => :get, :class => "small_button", :onclick => "check_more_than_one_group();" %>
+    <%= button_to 'New User', new_user_path, :method => :get, :class => "small_button", :id => "new_user", :form => {:onsubmit => "check_more_than_one_group(event);"} %>
     <%= button_to 'Passwords', passwords_path, :method => :get, :class => "small_button" %>
   </div>
   <div class="flex_row" >
-    <%= form_tag upload_users_file_path, :multipart => true do  %>
+    <%= form_tag upload_users_file_path, :onsubmit => "check_more_than_one_group(event);", :multipart => true do  %>
       <%= render "file_tag", title: "Upload file", name: "users", tag: :file, class_name: "standard_button", height: 60, file_type: ".txt" %>
     <% end %>
   </div>
