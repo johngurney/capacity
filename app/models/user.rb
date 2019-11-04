@@ -268,8 +268,7 @@ class User < ApplicationRecord
     lookups = Groupuserlookup.where(:user_id => self.id, :group_id => group.id)
 
     if lookups.count == 0
-      Groupuserlookup.create(:user_id => self.id, :group_id => group.id)
-      return
+      return Groupuserlookup.create(:user_id => self.id, :group_id => group.id)
     elsif lookups.count > 0
       #Delete all duplicate entries (ie those other than the first).  This is just housekeeping, it should never be required
       lookups.all[1..-1].delete_all if lookups.count > 1
