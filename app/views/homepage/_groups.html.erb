@@ -33,14 +33,14 @@
           <% end %>
         </div>
 
-      <% end %>
-      <div class="bottom_right" >
-        <div class="flex_row" style="height: auto;">
-          <%= submit_tag "Update", :class => "small_button", :style => "width:60px; height: 20px" %>
-          <button class="very_small_button" type="button" onclick="check_groups_on_off(true)">All on</button>
-          <button class="very_small_button" type="button" onclick="check_groups_on_off(false)">All off</button>
-        </div>
+        <div class="bottom_right" >
+          <div class="flex_row" style="height: auto;">
+            <%= submit_tag "Update", :class => "small_button", :style => "width:60px; height: 20px" %>
+            <button class="very_small_button" type="button" onclick="check_groups_on_off(true)">All on</button>
+            <button class="very_small_button" type="button" onclick="check_groups_on_off(false)">All off</button>
+          </div>
+        <% end %>
       </div>
-    </div>
-  <% end %>
+    <% end %>
+  </div>
 <% end %>
