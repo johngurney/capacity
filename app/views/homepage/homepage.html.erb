@@ -51,4 +51,4 @@
 
 </div>
 <hr>
-<%= render 'partner_homepage' %>
+<%= render 'partner_homepage' if logged_in_user_helper.present?  %>

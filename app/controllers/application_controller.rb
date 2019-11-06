@@ -17,17 +17,18 @@ class ApplicationController < ActionController::Base
 
   def check_logged_in
 
+    create_default_user if !check_if_admins_exist?
+
     #Check in case user deleted during session
     session[:logged_in_user] = nil if !session[:logged_in_user].blank? && !User.exists?(id: session[:logged_in_user].to_i)
 
-    if check_if_admins_exist?
-      if session[:logged_in_user].blank?
-        if cookies[:logged_in_token].blank? or ( ( (log_in_logs = Loginlog.where(:token => cookies[:logged_in_token])).count == 0 ) or !User.exists?(id: log_in_logs.first.user_id) )
-          render 'general/password'
-          false
-        else
-          session[:logged_in_user] = log_in_logs.first.user_id
-        end
+    if session[:logged_in_user].blank?
+      log = Loginlog.where(:token => cookies[:logged_in_token].to_s).first
+      if cookies[:logged_in_token].blank? or log.blank? or !User.exists?(id:log.user_id)
+        render 'general/password'
+        false
+      else
+        session[:logged_in_user] = log.user_id
       end
     end
   end
@@ -53,8 +54,41 @@ class ApplicationController < ActionController::Base
 
   def logged_in_user_helper
     user = User.find(session[:logged_in_user]) if !session[:logged_in_user].blank? and User.exists?(id:  session[:logged_in_user].to_i)
-    user
   end
+
+  def create_default_user
+    user = User.create(:first_name => "Admin", :last_name => "User", :user_type => "Administrator")
+    session[:logged_in_user] = user.id
+    default_group = Group.all.first
+    update_administrators_with_groups
+    user.set_selected(default_group, true)
+
+
+    $allow_cheatlogon = true
+    write_delete_cheat_logon_file
+
+
+  end
+
+  def write_delete_cheat_logon_file
+
+    filename = Rails.root.join("public", "cheat_log_in")
+    if $allow_cheatlogon
+        File.open(filename, 'wb') do |file|
+          file.write(1)
+        end
+      else
+        File.delete(filename) if File.exist?(filename)
+      end
+
+  end
+
+  def update_administrators_with_groups
+    User.where(:user_type => "Administrator").each do |user|
+      user.add_groups_to_administrator
+    end
+  end
+
 
   helper_method :telephone_link, :logged_in_user_helper
 

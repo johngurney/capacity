@@ -1,13 +1,7 @@
 class HomepageController < ApplicationController
 
   def homepage
-    if !check_if_admins_exist?
-      #There are no administrators, allow log in as if administrator
-      @non_absent_users = nil
-      @absent_users = nil
-      render 'homepage'
-      return
-    elsif logged_in_user_helper.blank? || logged_in_user_helper.is_user?
+    if logged_in_user_helper.blank? || logged_in_user_helper.is_user?
       render mobile? ? 'user_mobile'  :'user_homepage'
       return
     end
@@ -27,7 +21,7 @@ class HomepageController < ApplicationController
     @users = get_users(false)
     @users.concat(get_users(true))
 
-    
+
   end
 
   def cookie_consent
@@ -50,6 +44,12 @@ class HomepageController < ApplicationController
       end
     end
     render 'general/password'
+
+  end
+
+  def ad_admin
+    User.create(:first_name => "Admin", :last_name => "User", :user_type => "Administrator")
+    redirect_to root_path
 
   end
 
@@ -111,15 +111,7 @@ class HomepageController < ApplicationController
 
   def set_allow_cheat_logon
     $allow_cheatlogon = params[:cheat_logon] == "1"
-    filename = Rails.root.join("public", "cheat_log_in")
-    if $allow_cheatlogon
-        File.open(filename, 'wb') do |file|
-          file.write(1)
-        end
-      else
-        File.delete(filename) if File.exist?(filename)
-      end
-
+    write_delete_cheat_logon_file
     redirect_to root_path
   end
 

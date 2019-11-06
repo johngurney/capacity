@@ -51,4 +51,5 @@ Rails.application.routes.draw do
 
   post 'reset_cookie' => 'homepage#reset_cookie_consent', as: :reset_cookie_consent
 
+  post 'ad_admin' => 'homepage#ad_admin', as: :ad_admin
 end

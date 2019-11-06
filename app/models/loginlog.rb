@@ -1,2 +1,3 @@
 class Loginlog < ApplicationRecord
+    
 end

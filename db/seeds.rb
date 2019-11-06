@@ -41,15 +41,24 @@ public
 # area = Area.create(name: "Corporate disputes")
 # area.save
 
+
+groups = [ "Litigation", "Real Estate", "Corporate", "TMC", "EPC", "Finance" ]
+Group.delete_all
+groups.each do |l|
+  Group.create(:name => l)
+end
+
 locations = ["London", "Manchester", "Edinburgh", "Sheffield", "Glasgow", "Reading", "Liverpool", "Bristol"]
 Location.delete_all
 locations.each do |l|
   Location.create(:name => l)
 end
 
-
+lit_group_id = Group.where(:name => "Litigation").first.id
 departments = ["L&A", "Employment", "Insurance", "FS lit", "Energy"]
 Department.delete_all
-departments.each do |d|
-  Department.create(:name => d)
+departments.each do |dept|
+  Department.create(:name => dept, :group_id => lit_group_id)
 end
+
+# User.create(:first_name => "Admin", :last_name => "User", :user_type = "Administrator")

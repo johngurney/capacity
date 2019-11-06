@@ -1,44 +1,46 @@
-<script>
-  var check_groups = [<%= get_all_ids(logged_in_user_helper.effective_groups) %>];
-  function check_groups_on_off(v) {
-    check_groups.forEach (function(cb) {
-      document.getElementById("checkgroup"+cb).checked = v;
-    })
-  }
-</script>
+<% if logged_in_user_helper.present? %>
+  <script>
+    var check_groups = [<%= get_all_ids(logged_in_user_helper.effective_groups) %>];
+    function check_groups_on_off(v) {
+      check_groups.forEach (function(cb) {
+        document.getElementById("checkgroup"+cb).checked = v;
+      })
+    }
+  </script>
 
-<style>
+  <style>
 
-  .bottom_right {
-    position: absolute;
-    bottom: 0px;
-    right: 4px;
-  }
+    .bottom_right {
+      position: absolute;
+      bottom: 0px;
+      right: 4px;
+    }
 
-</style>
+  </style>
 
 
 
-<% if logged_in_user_helper.groups.count > 1 %>
-  <div class="select_box_wrapper" style="height: 60px; width: 300px; border-width: 2px; position: relative;">
-    <%= form_tag select_groups_path, method: "post" do %>
-      <div class="select_box_list" style="height: 40px">
-        <% logged_in_user_helper.effective_groups.order(:name).each do |group| %>
-          <span style="white-space: nowrap; margin-right:15px">
-            <%= check_box_tag 'checkgroup'+ group.id.to_s, "1", logged_in_user_helper.group_selected?(group) %>
-            <%= group.name %>
-          </span>
+  <% if logged_in_user_helper.groups.count > 1 %>
+    <div class="select_box_wrapper" style="height: 60px; width: 300px; border-width: 2px; position: relative;">
+      <%= form_tag select_groups_path, method: "post" do %>
+        <div class="select_box_list" style="height: 40px">
+          <% logged_in_user_helper.effective_groups.order(:name).each do |group| %>
+            <span style="white-space: nowrap; margin-right:15px">
+              <%= check_box_tag 'checkgroup'+ group.id.to_s, "1", logged_in_user_helper.group_selected?(group) %>
+              <%= group.name %>
+            </span>
 
-        <% end %>
-      </div>
+          <% end %>
+        </div>
 
-    <% end %>
-    <div class="bottom_right" >
-      <div class="flex_row" style="height: auto;">
-        <%= submit_tag "Update", :class => "small_button", :style => "width:60px; height: 20px" %>
-        <button class="very_small_button" type="button" onclick="check_groups_on_off(true)">All on</button>
-        <button class="very_small_button" type="button" onclick="check_groups_on_off(false)">All off</button>
+      <% end %>
+      <div class="bottom_right" >
+        <div class="flex_row" style="height: auto;">
+          <%= submit_tag "Update", :class => "small_button", :style => "width:60px; height: 20px" %>
+          <button class="very_small_button" type="button" onclick="check_groups_on_off(true)">All on</button>
+          <button class="very_small_button" type="button" onclick="check_groups_on_off(false)">All off</button>
+        </div>
       </div>
     </div>
-  </div>
+  <% end %>
 <% end %>

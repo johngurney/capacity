@@ -69,7 +69,6 @@ class User < ApplicationRecord
 
   def capacity_stg
     log = self.capacity_log
-    puts "log =" + log.capacity_number.to_s
     log.capacity_number.to_s + ( log.comment.blank? || log.comment == "" ? "" : " - " + log.comment) if log.present?
 
   end
@@ -177,6 +176,14 @@ class User < ApplicationRecord
     !self.user_type.blank? && (self.user_type == "Administrator")
   end
 
+  def is_partner?
+    !self.user_type.blank? && (self.user_type == "Partner")
+  end
+
+  def is_admin_or_partner?
+    self.is_admin? || self.is_partner?
+  end
+
   def is_user?
     !self.user_type.blank? && (self.user_type == "User")
   end
@@ -209,6 +216,9 @@ class User < ApplicationRecord
           return group
         end
       end
+      group self.groups.first
+      self.set_selected(group, true)
+      group
     end
   end
 
@@ -226,7 +236,7 @@ class User < ApplicationRecord
     if lookups.empty?
       Groupuserlookup.create(:user_id => self.id, :group_id => group.id, :selected => true)
       return
-    elsif logs.count > 1
+    elsif lookups.count > 1
       lookups.all[1..-1].delete_all if lookups.count > 1
     end
     lookup = lookups.first
@@ -235,12 +245,9 @@ class User < ApplicationRecord
   end
 
   def selected(group)
-    if self.groups.count == 1
-      true
-    else
-      logs = Groupuserlookup.where(:user_id => self.id, :group_id => group.id)
-      logs.first.selected if !logs.empty?
-    end
+    lookups = Groupuserlookup.where(:user_id => self.id, :group_id => group.id)
+    lookups.all[1..-1].delete_all if lookups.count > 1
+    !lookups.empty? ? lookups.first.selected : false
   end
 
 
@@ -301,6 +308,15 @@ class User < ApplicationRecord
       end
     end
     depts
+  end
+
+  def add_groups_to_administrator
+    if self.user_type == "Administrator"
+      Group.all.each do |group|
+        puts "*******" + self.groups.include?(group).to_s
+        self.groups << group if !self.groups.include?(group)
+      end
+    end
   end
 
 end

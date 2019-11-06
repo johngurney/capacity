@@ -6,14 +6,15 @@ class UsersController < ApplicationController
   def index
     user = logged_in_user_helper
     @users = []
-    user.groups.each do |group|
-      if user.selected(group)
-        @users.concat group.users if group.users.count > 0
+    if user.present?
+      user.groups.each do |group|
+        if user.selected(group)
+          @users.concat group.users if group.users.count > 0
+        end
       end
+      @users.uniq!
+      @users.sort_by! {|user| [user[:last_name], user[:first_name]] }
     end
-    @users.uniq!
-    puts @users.to_s
-    @users.sort_by! {|user| [user[:last_name], user[:first_name]] }
 
   end
 
@@ -41,6 +42,7 @@ class UsersController < ApplicationController
     @user.update_attributes(user_params)
     @user.department = Department.find( params[:user][:department].to_i )
     @user.location = Location.find( params[:user][:location].to_i )
+    @user.add_groups_to_administrator
 
     @user.save
     logged_in_user_helper.groups.each do |group|
@@ -59,6 +61,8 @@ class UsersController < ApplicationController
     @user.department = Department.find( params[:user][:department].to_i ) if params[:user][:department].to_i > 0
     @user.location = Location.find( params[:user][:location].to_i ) if params[:user][:location].to_i > 0
     @user.save
+    @user.add_groups_to_administrator
+
     redirect_to @user
 
   end
@@ -76,6 +80,8 @@ class UsersController < ApplicationController
 
 
   def upload_users_file
+
+    group = logged_in_user_helper.first_selected_group
 
     uploaded_io = params[:file]
 
@@ -126,6 +132,8 @@ class UsersController < ApplicationController
           user.user_type = "User"
 
           user.save if User.where("lower(email) = ?", user.email.downcase).count == 0
+
+          user.groups << group
         end
 
       end

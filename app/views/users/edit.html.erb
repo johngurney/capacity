@@ -2,7 +2,7 @@
 
 <%= render 'form', user: @user %>
 
-<% if @user.user_type == "Partner" %>
+<% if @user.is_admin_or_partner? %>
 
   <table width="100%">
     <col width="50%">

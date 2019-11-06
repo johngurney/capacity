@@ -17,7 +17,7 @@
       <col width="25%">
       <tr>
         <td>
-          <% if !(logged_in_user_helper).blank? && logged_in_user_helper.user_type != "User" then %>
+          <% if logged_in_user_helper.present? && (logged_in_user_helper.is_admin? || logged_in_user_helper.is_partner?) then %>
             <%= link_to "Home", root_path %>
           <% end %>
         </td>
