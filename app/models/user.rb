@@ -155,11 +155,6 @@ class User < ApplicationRecord
 
 
         total += (end_date - date) * capacity_number
-        puts (end_date-start_date).to_s
-        puts (first_log_date - start_date).to_s
-        puts end_date.class.to_s
-        puts first_log_date.class.to_s
-        puts (end_date - first_log_date).to_s
 
         return (total / (end_date - first_log_date)).round(2).to_s + ", " + ((first_log_date - start_date)/(end_date-start_date)).to_s
 
@@ -267,6 +262,39 @@ class User < ApplicationRecord
     n > 1
   end
 
+  def check_groups
+    #To be called when user made or amended to ensure groups correct
+    #For any user there must be at least one group for the user
+    #For any partner there must be at least one group for the user and at least one must be selected
+    #Any administrator must have all groups and at least one must be selected
+    #NB For any partner (or administrator), groups are set by an Administrator and set the users which can be seen, selected groups are set the partner
+
+    if self.is_user?
+      self.groups << Group.first if self.groups.count == 0
+
+    elsif self.is_partner?
+      self.groups << Group.first if self.groups.count == 0
+      self.ensure_one_group_selected
+
+    elsif self.is_admin?
+      Group.all.each do|group|
+        self.groups << group if !self.groups.include?(group)
+      end
+      self.ensure_one_group_selected
+
+    end
+
+
+
+  end
+
+  def ensure_one_group_selected
+    self.groups.each do|group|
+      return if self.selected(group)
+    end
+    self.set_selected(self.groups.first, true)
+  end
+
   def last_objective
     self.objectives.count == 0 ? "" : self.objectives.order(:created_at).last.text
   end
@@ -310,13 +338,5 @@ class User < ApplicationRecord
     depts
   end
 
-  def add_groups_to_administrator
-    if self.user_type == "Administrator"
-      Group.all.each do |group|
-        puts "*******" + self.groups.include?(group).to_s
-        self.groups << group if !self.groups.include?(group)
-      end
-    end
-  end
 
 end

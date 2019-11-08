@@ -85,7 +85,7 @@ class ApplicationController < ActionController::Base
 
   def update_administrators_with_groups
     User.where(:user_type => "Administrator").each do |user|
-      user.add_groups_to_administrator
+      user.check_groups
     end
   end
 

@@ -42,7 +42,7 @@ class UsersController < ApplicationController
     @user.update_attributes(user_params)
     @user.department = Department.find( params[:user][:department].to_i )
     @user.location = Location.find( params[:user][:location].to_i )
-    @user.add_groups_to_administrator
+    @user.check_groups
 
     @user.save
     logged_in_user_helper.groups.each do |group|
@@ -61,11 +61,12 @@ class UsersController < ApplicationController
     @user.department = Department.find( params[:user][:department].to_i ) if params[:user][:department].to_i > 0
     @user.location = Location.find( params[:user][:location].to_i ) if params[:user][:location].to_i > 0
     @user.save
-    @user.add_groups_to_administrator
+    @user.check_groups
 
     redirect_to @user
 
   end
+
 
   # DELETE /users/1
   # DELETE /users/1.json
@@ -129,7 +130,10 @@ class UsersController < ApplicationController
             user.email   = values[email_address_column]
           end
 
-          user.user_type = "User"
+
+          user.user_type = (user.position.downcase.to_s.include?("partner") ? "Partner" : "User")
+
+          puts "user.user_type2:" + user.position.to_s + "; "+ user.user_type
 
           user.save if User.where("lower(email) = ?", user.email.downcase).count == 0
 
@@ -226,14 +230,18 @@ class UsersController < ApplicationController
 
   def amend_user_groups
 
-    if params[:commit] == "Add group(s)"
-      Group.all.each do |group|
-        @user.groups << group if params["checkadd" + group.id.to_s ] == "1"
-      end
+    if !@user.is_admin?
+      #Administrators always have all groups
 
-    elsif params[:commit] == "Remove group(s)"
-      Group.all.each do |group|
-        @user.groups.delete(group) if params["checkremove" + group.id.to_s ] == "1" && @user.groups.count > 1
+      if params[:commit] == "Add group(s)"
+        Group.all.each do |group|
+          @user.groups << group if params["checkadd" + group.id.to_s ] == "1"
+        end
+
+      elsif params[:commit] == "Remove group(s)"
+        Group.all.each do |group|
+          @user.groups.delete(group) if params["checkremove" + group.id.to_s ] == "1" && @user.groups.count > 1
+        end
       end
     end
     redirect_to edit_user_path(@user)
@@ -291,7 +299,6 @@ class UsersController < ApplicationController
       @user.groups.delete_all
       @user.groups << group
 
-      puts "+++++++++" + group.id.to_s
 
     end
     redirect_to request.referer
