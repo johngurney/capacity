@@ -118,6 +118,9 @@ class HomepageController < ApplicationController
 
   def test
 
+    UserMailer.alert_email().deliver_now
+
+
     # Area.all.each do |area|
     #   area.group_id = 1
     #   area.save
@@ -131,31 +134,31 @@ class HomepageController < ApplicationController
     # end
 
 
-    User.all.each do |user|
-
-      prng = Random.new
-      date = Date.today
-
-      if user.is_user? && prng.rand(10) == 1
-        puts "***" + user.name
-
-        log = Capacitylog.where(:user_id => user.id).order(:created_at).last
-
-        if log.present?
-
-          return_date = date + prng.rand(14).to_i.days
-          while return_date.saturday? || return_date.sunday?
-            return_date += 1.days
-          end
-
-          log.return_date = return_date
-          log.absent = true
-          log.save
-        end
-
-      end
-    end
-
+    # User.all.each do |user|
+    #
+    #   prng = Random.new
+    #   date = Date.today
+    #
+    #   if user.is_user? && prng.rand(10) == 1
+    #     puts "***" + user.name
+    #
+    #     log = Capacitylog.where(:user_id => user.id).order(:created_at).last
+    #
+    #     if log.present?
+    #
+    #       return_date = date + prng.rand(14).to_i.days
+    #       while return_date.saturday? || return_date.sunday?
+    #         return_date += 1.days
+    #       end
+    #
+    #       log.return_date = return_date
+    #       log.absent = true
+    #       log.save
+    #     end
+    #
+    #   end
+    # end
+    #
 
     # Capacitylog.delete_all
 
