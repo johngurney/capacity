@@ -69,7 +69,7 @@ class User < ApplicationRecord
 
   def capacity_stg
     log = self.capacity_log
-    log.capacity_number.to_s + ( log.comment.blank? || log.comment == "" ? "" : " - " + log.comment) if log.present?
+    log.capacity_number.to_s + "-" + Capacitycode.where(:capacity_number => log.capacity_number).first.text.to_s + ( log.comment.blank? || log.comment == "" ? "" : " - " + log.comment) if log.present?
 
   end
 
@@ -105,6 +105,8 @@ class User < ApplicationRecord
     stg = ""
 
     Capacitylog.where(:user_id => self.id).where("created_at >= ? AND created_at < ?", start_date, end_date).order(:created_at).each do |log|
+
+      break if self.leaving_date.present? && self.leaving_date < log.created_at.to_datetime
       stg += ", " if stg != ""
       stg += log.capacity_number.to_s
     end
@@ -117,6 +119,7 @@ class User < ApplicationRecord
   def capacity_xs(start_date, end_date)
     stg = ""
     Capacitylog.where(:user_id => self.id).where("created_at >= ? AND created_at < ?", start_date, end_date).order(:created_at).each do |log|
+      break if self.leaving_date.present? && self.leaving_date < log.created_at.to_datetime
       stg += ", " if stg != ""
       stg += ((log.created_at.to_datetime - start_date) / (end_date - start_date)).to_s
     end
@@ -139,7 +142,7 @@ class User < ApplicationRecord
         first_log_date = start_date
       end
 
-      if log.present?
+      if log.present? && ( self.leaving_date.blank? || self.leaving_date >= log.created_at.to_datetime )
 
         capacity_number = log.capacity_number
 
@@ -147,16 +150,21 @@ class User < ApplicationRecord
         date = first_log_date.to_datetime
 
         Capacitylog.where(:user_id => self.id).where("created_at >= ? AND created_at < ?", start_date, end_date).order(:created_at).each do |log|
-          puts "total" + total.to_s
+
+          break if self.leaving_date.present? && self.leaving_date < log.created_at.to_datetime
+
           total += ( log.created_at.to_datetime - date ) * capacity_number
           date = log.created_at.to_datetime
           capacity_number = log.capacity_number
         end
 
-
-        total += (end_date - date) * capacity_number
-
-        return (total / (end_date - first_log_date)).round(2).to_s + ", " + ((first_log_date - start_date)/(end_date-start_date)).to_s
+        if self.leaving_date.present? && self.leaving_date < end_date
+          total += (self.leaving_date - date) * capacity_number
+          return (total / (self.leaving_date - first_log_date)).round(2).to_s + ", " + ((first_log_date - start_date)/(end_date-start_date)).to_s + ", " + ((self.leaving_date - start_date)/(end_date-start_date)).to_s
+        else
+          total += (end_date - date) * capacity_number
+          return (total / (end_date - first_log_date)).round(2).to_s + ", " + ((first_log_date - start_date)/(end_date-start_date)).to_s + ", 1"
+        end
 
 
       else
@@ -181,6 +189,10 @@ class User < ApplicationRecord
 
   def is_user?
     !self.user_type.blank? && (self.user_type == "User")
+  end
+
+  def has_left
+    self.leaving_date.present? && self.leaving_date < Date.today()
   end
 
   def history_start_date
@@ -217,6 +229,13 @@ class User < ApplicationRecord
     end
   end
 
+  def two_users_share_at_least_one_group(user)
+    self.groups.each do |group|
+      return true if user.groups.include?(group)
+    end
+    return false
+  end
+
   def groups_stg
     stg = ""
     self.groups.each do |group|
@@ -232,7 +251,7 @@ class User < ApplicationRecord
       Groupuserlookup.create(:user_id => self.id, :group_id => group.id, :selected => true)
       return
     elsif lookups.count > 1
-      lookups.all[1..-1].delete_all if lookups.count > 1
+      lookups.all[1..-1].each {|lookup| lookup.delete } if lookups.count > 1
     end
     lookup = lookups.first
     lookup.selected = value
@@ -241,7 +260,7 @@ class User < ApplicationRecord
 
   def selected(group)
     lookups = Groupuserlookup.where(:user_id => self.id, :group_id => group.id)
-    lookups.all[1..-1].delete_all if lookups.count > 1
+    lookups.all[1..-1].each {|lookup| lookup.delete }  if lookups.count > 1
     !lookups.empty? ? lookups.first.selected : false
   end
 
@@ -306,7 +325,7 @@ class User < ApplicationRecord
       return Groupuserlookup.create(:user_id => self.id, :group_id => group.id)
     elsif lookups.count > 0
       #Delete all duplicate entries (ie those other than the first).  This is just housekeeping, it should never be required
-      lookups.all[1..-1].delete_all if lookups.count > 1
+      lookups.all[1..-1].each {|lookup| lookup.delete }  if lookups.count > 1
     end
     lookups.first
 
@@ -336,6 +355,21 @@ class User < ApplicationRecord
       end
     end
     depts
+  end
+
+  def selected_groups_stg(selected_users_flag)
+    names = []
+    self.groups.order(:name).each do |group|
+      names << group.name if self.selected(group)
+    end
+    stg = ""
+    names.each do |name|
+      stg += (name == names.last ? " and " : ", ") if stg != ""
+      stg += name
+    end
+    stg += (" (selected users)") if selected_users_flag
+    return stg
+
   end
 
 

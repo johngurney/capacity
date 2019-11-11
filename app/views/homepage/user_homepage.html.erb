@@ -4,6 +4,7 @@
     <% Capacitycode.all.each do |code| %>
     if (value==<%= code.capacity_number.to_s%> ){
       document.getElementById("details").innerHTML = "<%= code.text %>";
+      document.getElementById("details").style = "color: <%= code.alert ? "red" : "black" %>";
       return true;
 
     }
@@ -44,7 +45,7 @@
 <h1>You are in <%= user.groups.first.name %></h1>
 <% if Capacitylog.where(:user_id => user.id).count > 0 %>
   <% log = Capacitylog.where(:user_id => user.id).order(:created_at).last %>
-  <h2 style="color: orange; margin-bottom: 0px";>Current capacity: <%= log.capacity_number.to_s %> - logged at <%= log.created_at.strftime("%d %b %Y at %H:%M") %></h2>
+  <h2 style="color: orange; margin-bottom: 0px";>Current capacity: <%= log.capacity_number.to_s %> - logged at <%= log.created_at.strftime("%e %B %Y at %H:%M") %></h2>
 <br/><br/>
 <% end %>
 
@@ -88,15 +89,20 @@
                 Capacity
               </td>
               <td>
-                <%= select_tag :capacity_number, options_for_select(Capacitycode.all.order(:capacity_number).map { |code| [code.capacity_number]}, (log.blank? ? 0 : log.capacity_number)), {:id => "selector", :onchange => "capacity_text(this.value)", :include_blank => "Select", :class => "small_button", :style => "text-align-last1: right;" }  %>
+                <select name="capacity_number" id="selector" onchange="capacity_text(this.value)" class="small_button" style="width: 70px; text-align-last: right;">
+                <option value="">Select</option>
+                <% Capacitycode.all.order(:capacity_number).each do |code| %>
+                    <option dir="rtl" <%= "style=\"color: red; font-weight: bold\"".html_safe if code.alert %> <%= "selected=\"selected\"".html_safe if log.present? && (log.capacity_number == code.capacity_number) %> value="<%= code.capacity_number.to_s %>"><%= code.capacity_number.to_s %></option>
+                <% end %>
               </td>
               </td>
               <td>
                 Details
               </td>
               <td>
-                <div id="details" >
-                  <%= log.text if log.present? %>
+                <% text, colour = log.text if log.present? %>
+                <div id="details" style="color: <%= colour.to_s %>">
+                  <%= text.to_s %>
                 </div>
               </td>
             </tr>
@@ -228,7 +234,7 @@
             <%= log.created_at.strftime("%H:%M on %d %b %Y") %>
           </td>
           <td>
-            <%= log.capacity_number %> - <%= log.text %>
+            <%= log.capacity_number %> - <%= log.text[0] %>
           </td>
           <td>
             <%= log.comment %>

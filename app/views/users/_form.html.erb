@@ -1,3 +1,24 @@
+<script type="text/javascript">
+
+  function set_manager_checkbox(value) {
+    if (value == "User") {
+      document.getElementById("manager_checkbox").style.display = "none";
+      document.getElementById("leaving_date").style.display = "table-row";
+    } else  {
+      document.getElementById("manager_checkbox").style.display = "block";
+      document.getElementById("leaving_date").style.display = "none";
+    }
+    return true;
+  }
+
+  function no_leaving_date() {
+    document.getElementById("leaving_date_field").value = 0;
+    event.preventDefault();
+  }
+
+
+</script>
+
   <%= form_with(model: user, local: true) do |form| %>
   <% if user.errors.any? %>
     <div id="error_explanation">
@@ -25,7 +46,12 @@
     </tr>
     <tr>
       <td>User type</td>
-      <td><%= form.select :user_type, ["Administrator", "Partner", "User"],{:include_blank => "None"}, {class: "small_field" , style: "width: 150px"}%></td>
+      <td>
+        <div class="flex_row">
+          <%= form.select :user_type, ["Administrator", "Partner", "User"],{:include_blank => "None"}, {class: "small_field" , style: "width: 150px", onchange: "set_manager_checkbox(this.value)" }%>
+          <div id="manager_checkbox" style="height: 28px; margin-left:10px; border-radius: 10px; padding: 0px 20px 0px 20px; border: 3px solid blue; display: <%= user.is_user? ? "none" : "block" %>">Manager<%= form.check_box :is_manager, :style => "margin-left:10px; margin-top: 4px; height: 16px; width: 16px" %></div>
+        </div>
+      </td>
       <td>Position</td>
       <td><%= form.text_field :position, :class => "small_field"  %></td>
     </tr>
@@ -41,6 +67,19 @@
       <td>Email address</td>
       <td><%= form.text_field :email, :class => "small_field"  %></td>
     </tr>
+
+
+    <tr id="leaving_date" style="display: <%= !user.is_user? ? "none" : "table-row" %>">
+      <td>
+        Leaving date
+      </td>
+      <td>
+        <%= form.date_field :leaving_date, :class => "small_field", :style => "width: 150px", :id => "leaving_date_field"  %>
+        <button class="small_button" style="width: 80px" onclick="no_leaving_date()">None</button>
+      </td>
+    </tr>
+
+
     <tr>
       <td>
       </td>

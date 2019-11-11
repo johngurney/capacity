@@ -25,30 +25,14 @@ class CapacitycodesController < ApplicationController
   # POST /capacitycodes.json
   def create
     @capacitycode = Capacitycode.new(capacitycode_params)
-
-    respond_to do |format|
-      if @capacitycode.save
-        format.html { redirect_to @capacitycode, notice: 'Capacitycode was successfully created.' }
-        format.json { render :show, status: :created, location: @capacitycode }
-      else
-        format.html { render :new }
-        format.json { render json: @capacitycode.errors, status: :unprocessable_entity }
-      end
-    end
+    redirect_to capacitycodes_path
   end
 
   # PATCH/PUT /capacitycodes/1
   # PATCH/PUT /capacitycodes/1.json
   def update
-    respond_to do |format|
-      if @capacitycode.update(capacitycode_params)
-        format.html { redirect_to @capacitycode, notice: 'Capacitycode was successfully updated.' }
-        format.json { render :show, status: :ok, location: @capacitycode }
-      else
-        format.html { render :edit }
-        format.json { render json: @capacitycode.errors, status: :unprocessable_entity }
-      end
-    end
+      @capacitycode.update(capacitycode_params)
+      redirect_to capacitycodes_path
   end
 
   # DELETE /capacitycodes/1
@@ -92,6 +76,6 @@ class CapacitycodesController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def capacitycode_params
-      params.require(:capacitycode).permit(:text, :number)
+      params.require(:capacitycode).permit(:text, :capacity_number, :alert)
     end
 end

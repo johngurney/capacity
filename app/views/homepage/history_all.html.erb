@@ -3,19 +3,25 @@
 
   var RADIUS = 3;
 
+  var all_users_for_this_user;
+
   window.onload = update_charts;
-
-  (function() {
-    update_charts();
-    }).call(this);
-
 
   function update_charts() {
 
+
       months = [<%= months(logged_in_user_helper.history_start_date.to_datetime, logged_in_user_helper.history_end_date.to_datetime).html_safe %>];
-      xs = [<%= all_capacity_xs(logged_in_user_helper.history_start_date.to_datetime, logged_in_user_helper.history_end_date.to_datetime) %> ];
-      ys = [<%= all_capacity_ys(logged_in_user_helper.history_start_date.to_datetime, logged_in_user_helper.history_end_date.to_datetime) %> ];
-      var average_value = [<%= all_average_capacity(logged_in_user_helper.history_start_date.to_datetime, logged_in_user_helper.history_end_date.to_datetime) %>];
+
+      <% xs_stg, ys_stg, avg, number_of_users, max_number_of_users, number_of_user_graph_ticks = all_capacity_xs_and_ys(logged_in_user_helper.history_start_date.to_datetime, logged_in_user_helper.history_end_date.to_datetime, @users - @deselected_users) %>
+
+      xs = [<%= xs_stg.html_safe %> ];
+      ys = [<%= ys_stg.html_safe %> ];
+
+      var average_value = <%= avg %>;
+      var number_of_users = [<%= number_of_users %>];
+      var max_number_of_users = <%= max_number_of_users %>;
+
+      var number_of_user_graph_ticks = [<%= number_of_user_graph_ticks %>];
 
 
       var c = document.getElementById("capacity_canvas");
@@ -25,7 +31,6 @@
       var y0 = c.height * .9, ytop = c.height * .2;
       var graph_w = xright - x0, graph_h = ytop - y0;
 
-      ctx.fillStyle = "black";
       ctx.strokeStyle = "black";
 
       ctx.beginPath();
@@ -34,10 +39,19 @@
       ctx.lineTo(xright, y0);
       ctx.stroke();
 
+      ctx.strokeStyle = "blue";
+
+      ctx.beginPath();
+      ctx.moveTo(xright, ytop);
+      ctx.lineTo(xright, y0);
+      ctx.stroke();
+
+
       var n1 = 0, flag = false, xpos1, ypos1;
       ctx.textAlign = "center";
-
       ctx.font = "10px Arial";
+      ctx.fillStyle = "black";
+
       months.forEach (function(m) {
         var xpos = x0 + (n1 + .5) / months.length * graph_w;
         ctx.fillText(m, xpos, y0 + 14);
@@ -55,6 +69,23 @@
         ctx.stroke();
         ctx.fillText(n, x0 - 8, ypos + 4);
       }
+      ctx.textAlign = "left";
+      ctx.fillText("Avg capacity", 6, ytop - 20);
+
+      ctx.fillStyle = "blue";
+      ctx.textAlign = "left";
+      number_of_user_graph_ticks.forEach (function(n) {
+        var ypos = y0 + n / max_number_of_users * graph_h;
+        ctx.beginPath();
+        ctx.moveTo(xright, ypos);
+        ctx.lineTo(xright + 4, ypos);
+        ctx.stroke();
+        ctx.fillText(n, xright + 8, ypos + 4);
+      })
+      ctx.textAlign = "right";
+      ctx.fillText("No. of users", c.width - 6, ytop - 20);
+
+
 
 
       n1 = 0;
@@ -62,26 +93,27 @@
 
       xs.forEach (function(x) {
         var xpos = x0 + x * graph_w;
-        var ypos = y0 + ys[n1] / 4 * graph_h;
+        var y_capacity_pos = y0 + ys[n1] / 4 * graph_h;
+        var y_number_of_users = y0 + number_of_users[n1] / max_number_of_users * graph_h;
 
-
-        ctx.beginPath();
-        ctx.moveTo(xpos, ypos);
-        ctx.arc(xpos, ypos, RADIUS, 0, 2 * Math.PI, false);
-        ctx.fillStyle = 'black';
-        ctx.strokeStyle = 'black';
-        ctx.fill();
 
         if (flag) {
+          ctx.strokeStyle = 'black';
           ctx.beginPath();
-          ctx.moveTo(xpos1, ypos1);
-          ctx.lineTo(xpos, ypos);
+          ctx.moveTo(xpos1, y_capacity_pos1);
+          ctx.lineTo(xpos, y_capacity_pos);
           ctx.stroke();
 
+          ctx.strokeStyle = 'blue';
+          ctx.beginPath();
+          ctx.moveTo(xpos1, y_number_of_users1);
+          ctx.lineTo(xpos, y_number_of_users);
+          ctx.stroke();
         }
         flag = true;
         xpos1 = xpos;
-        ypos1 = ypos;
+        y_capacity_pos1 = y_capacity_pos;
+        y_number_of_users1 = y_number_of_users;
         n1 += 1;
 
       })
@@ -89,17 +121,19 @@
 
       ctx.font = "20px Arial";
       ctx.textAlign = "left";
-      ctx.fillText("Capacity history for xx", c.width * .02, c.height * .06 );
+      ctx.fillText("Capacity history for <%= logged_in_user_helper.selected_groups_stg(@deselected_users.present?) %>", c.width * .02, c.height * .06 );
       ctx.font = "10px Arial";
       ctx.fillStyle = "red";
       // ctx.strokeStyle = "red";
 
       //Draw average
 
-      ypos = y0 + average_value[0] / 4 * graph_h;
+      // ypos = y0 + average_value[0] / 4 * graph_h;
+      ypos = y0 + average_value / 4 * graph_h;
       ctx.strokeStyle = "red";
       ctx.beginPath();
-      ctx.moveTo(x0 + average_value[1] * graph_w, ypos);
+      // ctx.moveTo(x0 + average_value[1] * graph_w, ypos);
+      ctx.moveTo(x0 + 0 * graph_w, ypos);
       ctx.lineTo(xright, ypos);
       ctx.stroke();
 
@@ -107,27 +141,51 @@
       ctx.fillText("Average", x0 - 6, ypos + 4);
 
       ctx.textAlign = "left";
-      ctx.fillText(average_value[0], xright + 6, ypos + 4 );
+      ctx.fillText(average_value, xright + 6, ypos + 4 );
     }
+
+    function check_users_on_off(v) {
+      var check_users = [<%= get_all_ids(@users) %>];
+      check_users.forEach (function(cb) {
+        document.getElementById("checkuser"+cb).checked = v;
+      })
+    }
+
 </script>
 <%= @test %>
 <h1>History</h1>
 
-<div class="select_box_wrapper" style="height: 150px; margin-bottom: 20px">
+<div>
+  <%= render "groups", :width => "100%" %>
+</div>
+
+<div class="select_box_wrapper" style="height: 150px; border-width: 2px; width: 100%; margin-top: 10px; margin-bottom: 10px; position: relative;">
   <h3>Users</h3>
-  <div class="select_box_list" style="height: 100px">
-    <% @users.each do |user| %>
-      <span style="white-space: nowrap;">
-        <%= check_box_tag 'check'+ user[:user].id.to_s, 1, true %>
-        <%= user[:user].name %>
-      </span>
-    <% end %>
-  </div>
-  xx
+
+  <%= form_tag history_all_select_users_path, method: "get" do %>
+
+    <div class="select_box_list" style="height: 100px">
+      <% @users.each do |user| %>
+        <span style="white-space: nowrap;">
+          <%= check_box_tag 'checkuser'+ user.id.to_s, 1, !@deselected_users.include?(user) %>
+          <%= user.name %>
+        </span>
+      <% end %>
+    </div>
+
+    <div class="bottom_right" >
+      <div class="flex_row" style="height: auto;">
+        <%= submit_tag "Update", :class => "small_button", :style => "width:60px; height: 20px" %>
+        <button class="very_small_button" type="button" onclick="check_users_on_off(true)">All on</button>
+        <button class="very_small_button" type="button" onclick="check_users_on_off(false)">All off</button>
+      </div>
+    </div>
+  <% end %>
+
 </div>
 
 <canvas id="capacity_canvas" width="700" height="500" style="border:1px solid #000000; background-color:white; "></canvas>
-<%= form_tag root_path, method: "get", id: "selected_history" do %>
+<%= form_tag selected_history_path, method: "get", id: "selected_history" do %>
 <div style ="display: inline-flex; flex-direction: row; align-items: center" >
   Start date
   <%= date_field_tag :start_date, logged_in_user_helper.history_start_date.strftime("%Y-%m-%d"), :class=>"small_button" %>

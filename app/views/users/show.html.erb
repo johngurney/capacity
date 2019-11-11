@@ -60,7 +60,12 @@
     <td>Email address</td>
     <td><%= mail_to @user.email , nil , subject: "Capacity query" , body: "Do you have any capacity for  new matter?" %></td>
   </tr>
-  </tr>
+  <% if @user.leaving_date.present? %>
+    <tr style="color: red; font-weight: bold">
+      <td>Leaving date</td>
+      <td><%= @user.leaving_date.strftime("%e %b %Y") %></td>
+    </tr>
+  <% end %>
 </table>
 
 <% if @user.is_user? %>

@@ -1,5 +1,5 @@
 class UsersController < ApplicationController
-  before_action :set_user, only: [:show, :edit, :update, :destroy, :capacity_log, :amend_aois, :make_password, :history, :selected_history, :amend_user_groups, :assign_groups, :set_objective, :set_group_for_user]
+  before_action :set_user, only: [:show, :edit, :update, :destroy, :capacity_log, :amend_aois, :make_password, :history, :amend_user_groups, :assign_groups, :set_objective, :set_group_for_user]
 
   # GET /users
   # GET /users.json
@@ -133,7 +133,8 @@ class UsersController < ApplicationController
 
           user.user_type = (user.position.downcase.to_s.include?("partner") ? "Partner" : "User")
 
-          puts "user.user_type2:" + user.position.to_s + "; "+ user.user_type
+          user.check_groups
+
 
           user.save if User.where("lower(email) = ?", user.email.downcase).count == 0
 
@@ -150,7 +151,12 @@ class UsersController < ApplicationController
 
     log = Capacitylog.create(:user_id => @user.id, :capacity_number => params[:capacity_number].to_i, :comment => params[:text], :absent => params[:absent] == "1", :return_date => params[:return_date] )
 
-    puts "***" + log.to_s
+    manager_emails = ""
+    User.where(:is_manager => true).each do |manager|
+      manager_emails += (manager_emails == "" ? "" :"; ") + manager.email if manager.two_users_share_at_least_one_group(logged_in_user_helper)
+    end
+    UserMailer.alert_email(manager_emails, logged_in_user_helper).deliver_now if Capacitycode.where(:capacity_number => params[:capacity_number].to_i).first.alert
+
     redirect_to root_path
 
   end
@@ -218,14 +224,14 @@ class UsersController < ApplicationController
         else
           user.history_start_date = Date.new(Date.today.year - 2, 5, 1)
         end
-        user.history_end_date = @user.history_start_date.next_year - 1
+        user.history_end_date = user.history_start_date.next_year - 1
       end
     end
     logged_in_user_helper.groups.each do |group|
       user.groups << group
     end
     user.save
-    redirect_to history_path(@user)
+    redirect_to request.referer
   end
 
   def amend_user_groups
@@ -322,7 +328,7 @@ class UsersController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def user_params
-      params.require(:user).permit(:first_name, :last_name, :user_type, :position, :telephone, :email)
+      params.require(:user).permit(:first_name, :last_name, :user_type, :position, :telephone, :email, :is_manager, :leaving_date)
     end
 
     def find_in_array(arry , text)

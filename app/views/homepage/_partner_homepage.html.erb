@@ -117,7 +117,7 @@
       </td>
       <td>
         <%= user[:capacity_number] %><% if user[:capacity_number] != 0 %> - <%= Capacitycode.where(:capacity_number => user[:capacity_number]).first.text %><% end %>
-        <% if !user[:capacity_log].blank? %>(Last updated <%= user[:capacity_log].created_at.strftime("%e %b %Y")%>)<% end %>
+        <% if !user[:capacity_log].blank? %>(Last updated <%= user[:capacity_log].created_at.strftime("%e %b %Y") %>)<% end %>
 
       </td>
       <td>
@@ -125,6 +125,11 @@
           <%= user[:capacity_log].comment %>
         <% end %>
         <scan style="color:red"><%= user[:user].last_objective %></scan>
+        <% if user[:user].leaving_date.present? %>
+          <scan style="color:red; font-weight: bold">
+            Leaving date: <%= user[:user].leaving_date.strftime("%e %b %Y") %>
+          </scan>
+        <% end %>
       </td>
     </tr>
 
@@ -196,6 +201,11 @@
           <%= user[:capacity_log].comment %>
         <% end %>
         <scan style="color:red"><%= user[:user].last_objective %></scan>
+        <% if user[:user].leaving_date.present? %>
+          <scan style="color:red; font-weight: bold">
+            Leaving date: <%= user[:user].leaving_date.strftime("%e %b %Y") %>
+          </scan>
+        <% end %>
       </td>
     </tr>
     <% end %>

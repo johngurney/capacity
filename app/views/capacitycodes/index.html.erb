@@ -12,10 +12,11 @@
   </thead>
 
   <tbody>
-    <% @capacitycodes.each do |capacitycode| %>
+    <% @capacitycodes.order(:capacity_number).each do |capacitycode| %>
       <tr>
         <td><%= capacitycode.capacity_number %></td>
         <td><%= capacitycode.text %></td>
+        <td style="color: red"><%= "Alert" if capacitycode.alert %></td>
         <td><%= link_to 'Edit', edit_capacitycode_path(capacitycode) %></td>
         <td><%= link_to 'Delete', capacitycode, method: :delete, data: { confirm: 'Are you sure?' } %></td>
       </tr>

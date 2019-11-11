@@ -46,8 +46,10 @@ Rails.application.routes.draw do
   post 'make_all_passwords' => 'users#make_all_passwords', as: :make_all_passwords
   get 'history/.:id' => 'users#history', as: :history
 
-  get 'selected_history/.:id' => 'users#selected_history', as: :selected_history
+  get 'selected_history' => 'users#selected_history', as: :selected_history
   get 'history_all' => 'homepage#history_all', as: :history_all
+
+  get 'history_all_select_users' => 'homepage#history_all_select_users', as: :history_all_select_users
 
   post 'reset_cookie' => 'homepage#reset_cookie_consent', as: :reset_cookie_consent
 

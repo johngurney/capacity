@@ -11,17 +11,23 @@
     </div>
   <% end %>
 
-  <div class="field">
+
+  <div class="flex_row" style="margin-top: 40px;">
     <%= form.label :text %>
-    <%= form.text_field :text %>
+    <%= form.text_field :text, :class => "small_button", :style => "text-align: left; width: 250px; padding-left:5px; margin-left: 40px;" %>
+
+    <%= form.label :capacity_number, :style => "margin-left: 100px;" %>
+    <%= form.text_field :capacity_number, :class => "small_button", :style => "text-align: left; width: 100px; padding-left:5px; margin-left: 40px;" %>
+
+    <%= form.label :alert_code, :style => "margin-left: 100px;" %>
+    <%= form.check_box :alert, :class => "small_button", :style => "text-align: left; padding-left:5px; margin-left: 40px;" %>
+
   </div>
 
-  <div class="field">
-    <%= form.label :number %>
-    <%= form.number_field :number %>
-  </div>
 
   <div class="actions">
-    <%= form.submit %>
+    <%= form.submit "Ok", :class=>"small_button" %>
   </div>
+
+
 <% end %>

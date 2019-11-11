@@ -191,3 +191,9 @@
             display: block;
             width: 800px;
         }
+
+        .bottom_right {
+          position: absolute;
+          bottom: 0px;
+          right: 4px;
+        }

@@ -10,17 +10,38 @@ class HomepageController < ApplicationController
     @absent_users = get_users(true)
     get_emails
 
-    if logged_in_user_helper.user_type == "Partner" or mobile?
+    if logged_in_user_helper.is_partner? or mobile?
       render mobile? ? 'partner_mobile'  :'partner_homepage'
       return
     end
 
   end
 
-  def history_all
-    @users = get_users(false)
-    @users.concat(get_users(true))
+  def history_all_select_users
+    @flag = true
+    history_all
+  end
 
+
+  def history_all
+    @users = []
+    get_users(false).each do |user|
+      @users << user[:user]
+    end
+    get_users(true).each do |user|
+      @users << user[:user]
+    end
+
+    @deselected_users = []
+
+    if @flag
+      @users.each do |user|
+        puts "user" + user.id.to_s
+        @deselected_users << user if params["checkuser" + user.id.to_s] != "1"
+      end
+    end
+
+    render "history_all"
 
   end
 
@@ -91,7 +112,7 @@ class HomepageController < ApplicationController
        if user.selected(group)
          group.users.each do |user|
            log = user.capacity_log
-           if user.is_user? && user.check_search_criteria(@included_areas, @included_departments, @included_locations) && ((log.present? and log.absent) ^ !is_asbent) # ^ is xor
+           if user.is_user? && !user.has_left && user.check_search_criteria(@included_areas, @included_departments, @included_locations) && ((log.present? and log.absent) ^ !is_asbent) # ^ is xor
              users << {:user => user, :capacity_log => log, :capacity_number => (log.blank? ? 0 : log.capacity_number) }
            end
          end
@@ -118,7 +139,9 @@ class HomepageController < ApplicationController
 
   def test
 
-    UserMailer.alert_email().deliver_now
+    # User.all.each do |user|
+    #   user.check_groups
+    #  end
 
 
     # Area.all.each do |area|
@@ -126,70 +149,69 @@ class HomepageController < ApplicationController
     #   area.save
     # end
 
-    # User.all.each do |user|
-    #   if user.position == "Partner" && user.user_type == "User"
-    #     user.user_type = "Partner"
-    #     user.save
-    #   end
-    # end
 
 
     # User.all.each do |user|
     #
-    #   prng = Random.new
-    #   date = Date.today
+    #   if user.is_user?
     #
-    #   if user.is_user? && prng.rand(10) == 1
-    #     puts "***" + user.name
+    #     prng = Random.new
+    #     date = Date.today
     #
-    #     log = Capacitylog.where(:user_id => user.id).order(:created_at).last
+    #     if user.is_user? && prng.rand(10) == 1
+    #       puts "***" + user.name
     #
-    #     if log.present?
+    #       log = Capacitylog.where(:user_id => user.id).order(:created_at).last
     #
-    #       return_date = date + prng.rand(14).to_i.days
-    #       while return_date.saturday? || return_date.sunday?
-    #         return_date += 1.days
+    #       if log.present?
+    #
+    #         return_date = date + prng.rand(14).to_i.days
+    #         while return_date.saturday? || return_date.sunday?
+    #           return_date += 1.days
+    #         end
+    #
+    #         log.return_date = return_date
+    #         log.absent = true
+    #         log.save
     #       end
     #
-    #       log.return_date = return_date
-    #       log.absent = true
-    #       log.save
     #     end
-    #
     #   end
     # end
-    #
 
-    # Capacitylog.delete_all
 
-    # User.all.each do |user|
-    #
-    #   prng = Random.new
-    #   date = Date.today
-    #   capacity_number = 3
-    #
-    #   (1..30).each do |n|
-    #
-    #     capacity_number += rand(3) - 1
-    #
-    #     if capacity_number > 4
-    #       capacity_number = 4
-    #     elsif capacity_number < 1
-    #         capacity_number = 1
-    #     end
-    #
-    #     no_days = prng.rand(14).to_i + 2
-    #     date -= no_days.days
-    #
-    #     log = Capacitylog.new
-    #     log.created_at = date
-    #     log.capacity_number = capacity_number
-    #     log.user_id = user.id
-    #     log.absent = false
-    #     log.save
-    #
-    #   end
-    # end
+    Capacitylog.delete_all
+
+    User.all.each do |user|
+      if user.is_user?
+
+        prng = Random.new
+        date = Date.today
+        capacity_number = 3
+
+        (1..30).each do |n|
+
+          capacity_number += rand(3) - 1
+
+          if capacity_number > 4
+            capacity_number = 4
+          elsif capacity_number < 1
+              capacity_number = 1
+          end
+
+          no_days = prng.rand(14).to_i + 2
+          date -= no_days.days
+
+          log = Capacitylog.new
+          log.created_at = date
+          log.capacity_number = capacity_number
+          log.user_id = user.id
+          log.absent = false
+          log.save
+        end
+
+      end
+    end
 
     # User.all.each do |user|
     #   if user.user_type.blank?
@@ -251,6 +273,7 @@ class HomepageController < ApplicationController
       @non_absent_users = get_users(false)
       @absent_users = get_users(true)
       get_emails
+
 
     render "partner_homepage"
     end
