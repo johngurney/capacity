@@ -91,11 +91,11 @@ module ApplicationHelper
 
         total += (date - current_date).to_f * avg
       end
-    #
-    #   logs.each do |log|
-    #     users_last_number[log.user_id.to_s] = log.capacity_number if log.created_at == date
-    #   end
-    #
+
+      logs.each do |log|
+        users_last_number[log.user_id.to_s] = log.capacity_number if log.created_at == date
+      end
+
     #   leaving_dates.each do |user_id, leaving_date|
     #     if leaving_date < date
     #       users_last_number.delete(user_id)
