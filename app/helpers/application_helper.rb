@@ -54,6 +54,8 @@ module ApplicationHelper
         log = Capacitylog.where(:user_id => user.id).where("created_at <= ?", start_date).order(:created_at).last
         users_last_number[user.id.to_s] = log.capacity_number if log.present?
 
+        puts "***" + user.id.to_s
+
         logs.concat Capacitylog.where(:user_id => user.id).where("created_at >= ? AND created_at < ?", start_date, leaving_date.blank? || leaving_date >= end_date ? end_date : leaving_date)
 
       end
@@ -65,6 +67,7 @@ module ApplicationHelper
     log_dates =[]
 
     logs.each do |log|
+      puts "+++" + log.id.to_s
       log_datetime = log.created_at.to_datetime
       log_dates << log_datetime if !log_dates.include?(log_datetime)
     end
@@ -101,6 +104,8 @@ module ApplicationHelper
       end
 
       current_date = date
+
+      puts "$$$" + date.to_s
 
     end
 
