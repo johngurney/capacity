@@ -41,82 +41,82 @@ module ApplicationHelper
 
   def all_capacity_xs_and_ys(start_date, end_date, users)
 
-    test_stg = ""
-
-    users_last_number = {}
-    leaving_dates = {}
-    logs = []
-
-    users.each do |user|
-      leaving_date = user.leaving_date
-      if leaving_date.blank? || leaving_date > start_date
-        leaving_dates[user.id.to_s] = leaving_date if leaving_date.present? && leaving_date < end_date
-        log = Capacitylog.where(:user_id => user.id).where("created_at <= ?", start_date).order(:created_at).last
-        users_last_number[user.id.to_s] = log.capacity_number if log.present?
-
-        puts "***" + user.id.to_s
-
-        logs.concat Capacitylog.where(:user_id => user.id).where("created_at >= ? AND created_at < ?", start_date, leaving_date.blank? || leaving_date >= end_date ? end_date : leaving_date)
-
-      end
-
-    end
-
-    logs.sort_by! {|log| [ log[:created_at] ]}
-
-    log_dates =[]
-
-    logs.each do |log|
-      puts "+++" + log.id.to_s
-      log_datetime = log.created_at.to_datetime
-      log_dates << log_datetime if !log_dates.include?(log_datetime)
-    end
-
-    current_date = start_date
-    xs_stg = ""
-    ys_stg = ""
-    number_of_users = []
-    total = 0
-    actual_start_date = nil
-
-    log_dates.each do |date|
-      xs_stg +=", " if xs_stg != ""
-      ys_stg +=", " if ys_stg != ""
-      avg = average_for_hash(users_last_number)
-      if avg.present?
-        actual_start_date = current_date if actual_start_date.blank?
-        xs_stg += ((current_date - start_date).to_f / (end_date - start_date).to_f).round(4).to_s
-        ys_stg += avg.round(4).to_s
-        number_of_users << users_last_number.count
-
-        total += (date - current_date).to_f * avg
-      end
-
-      logs.each do |log|
-        users_last_number[log.user_id.to_s] = log.capacity_number if log.created_at == date
-      end
-
-      leaving_dates.each do |user_id, leaving_date|
-        if leaving_date < date
-          users_last_number.delete(user_id)
-          leaving_dates.delete(user_id)
-        end
-      end
-
-      current_date = date
-
-      puts "$$$" + date.to_s
-
-    end
-
-    number_of_users_stg = ""
-    number_of_users.each do |n|
-      number_of_users_stg +=", " if number_of_users_stg != ""
-      number_of_users_stg += n.to_s
-    end
-
-    actual_start_date = start_date if actual_start_date.blank?
-    return xs_stg, ys_stg, (total / (end_date - actual_start_date)).to_f.round(4).to_s, number_of_users_stg, number_of_users.max.to_s, graph_ticks(number_of_users.max)
+    # test_stg = ""
+    #
+    # users_last_number = {}
+    # leaving_dates = {}
+    # logs = []
+    #
+    # users.each do |user|
+    #   leaving_date = user.leaving_date
+    #   if leaving_date.blank? || leaving_date > start_date
+    #     leaving_dates[user.id.to_s] = leaving_date if leaving_date.present? && leaving_date < end_date
+    #     log = Capacitylog.where(:user_id => user.id).where("created_at <= ?", start_date).order(:created_at).last
+    #     users_last_number[user.id.to_s] = log.capacity_number if log.present?
+    #
+    #     puts "***" + user.id.to_s
+    #
+    #     logs.concat Capacitylog.where(:user_id => user.id).where("created_at >= ? AND created_at < ?", start_date, leaving_date.blank? || leaving_date >= end_date ? end_date : leaving_date)
+    #
+    #   end
+    #
+    # end
+    #
+    # logs.sort_by! {|log| [ log[:created_at] ]}
+    #
+    # log_dates =[]
+    #
+    # logs.each do |log|
+    #   puts "+++" + log.id.to_s
+    #   log_datetime = log.created_at.to_datetime
+    #   log_dates << log_datetime if !log_dates.include?(log_datetime)
+    # end
+    #
+    # current_date = start_date
+    # xs_stg = ""
+    # ys_stg = ""
+    # number_of_users = []
+    # total = 0
+    # actual_start_date = nil
+    #
+    # log_dates.each do |date|
+    #   xs_stg +=", " if xs_stg != ""
+    #   ys_stg +=", " if ys_stg != ""
+    #   avg = average_for_hash(users_last_number)
+    #   if avg.present?
+    #     actual_start_date = current_date if actual_start_date.blank?
+    #     xs_stg += ((current_date - start_date).to_f / (end_date - start_date).to_f).round(4).to_s
+    #     ys_stg += avg.round(4).to_s
+    #     number_of_users << users_last_number.count
+    #
+    #     total += (date - current_date).to_f * avg
+    #   end
+    #
+    #   logs.each do |log|
+    #     users_last_number[log.user_id.to_s] = log.capacity_number if log.created_at == date
+    #   end
+    #
+    #   leaving_dates.each do |user_id, leaving_date|
+    #     if leaving_date < date
+    #       users_last_number.delete(user_id)
+    #       leaving_dates.delete(user_id)
+    #     end
+    #   end
+    #
+    #   current_date = date
+    #
+    #   puts "$$$" + date.to_s
+    #
+    # end
+    #
+    # number_of_users_stg = ""
+    # number_of_users.each do |n|
+    #   number_of_users_stg +=", " if number_of_users_stg != ""
+    #   number_of_users_stg += n.to_s
+    # end
+    #
+    # actual_start_date = start_date if actual_start_date.blank?
+    # return xs_stg, ys_stg, (total / (end_date - actual_start_date)).to_f.round(4).to_s, number_of_users_stg, number_of_users.max.to_s, graph_ticks(number_of_users.max)
 
   end
 
