@@ -71,14 +71,14 @@ module ApplicationHelper
       log_datetime = log.created_at.to_datetime
       log_dates << log_datetime if !log_dates.include?(log_datetime)
     end
-    #
-    # current_date = start_date
-    # xs_stg = ""
-    # ys_stg = ""
-    # number_of_users = []
-    # total = 0
-    # actual_start_date = nil
-    #
+
+    current_date = start_date
+    xs_stg = ""
+    ys_stg = ""
+    number_of_users = []
+    total = 0
+    actual_start_date = nil
+
     # log_dates.each do |date|
     #   xs_stg +=", " if xs_stg != ""
     #   ys_stg +=", " if ys_stg != ""
