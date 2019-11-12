@@ -79,7 +79,7 @@ module ApplicationHelper
     total = 0
     actual_start_date = nil
 
-    # log_dates.each do |date|
+    log_dates.each do |date|
     #   xs_stg +=", " if xs_stg != ""
     #   ys_stg +=", " if ys_stg != ""
     #   avg = average_for_hash(users_last_number)
@@ -107,7 +107,7 @@ module ApplicationHelper
     #
     #   puts "$$$" + date.to_s
     #
-    # end
+    end
     #
     # number_of_users_stg = ""
     # number_of_users.each do |n|
