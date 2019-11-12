@@ -80,17 +80,17 @@ module ApplicationHelper
     actual_start_date = nil
 
     log_dates.each do |date|
-    #   xs_stg +=", " if xs_stg != ""
-    #   ys_stg +=", " if ys_stg != ""
-    #   avg = average_for_hash(users_last_number)
-    #   if avg.present?
-    #     actual_start_date = current_date if actual_start_date.blank?
-    #     xs_stg += ((current_date - start_date).to_f / (end_date - start_date).to_f).round(4).to_s
-    #     ys_stg += avg.round(4).to_s
-    #     number_of_users << users_last_number.count
-    #
-    #     total += (date - current_date).to_f * avg
-    #   end
+      xs_stg +=", " if xs_stg != ""
+      ys_stg +=", " if ys_stg != ""
+      avg = average_for_hash(users_last_number)
+      if avg.present?
+        actual_start_date = current_date if actual_start_date.blank?
+        xs_stg += ((current_date - start_date).to_f / (end_date - start_date).to_f).round(4).to_s
+        ys_stg += avg.round(4).to_s
+        number_of_users << users_last_number.count
+
+        total += (date - current_date).to_f * avg
+      end
     #
     #   logs.each do |log|
     #     users_last_number[log.user_id.to_s] = log.capacity_number if log.created_at == date
