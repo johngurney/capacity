@@ -43,25 +43,25 @@ module ApplicationHelper
 
     # test_stg = ""
     #
-    # users_last_number = {}
-    # leaving_dates = {}
-    # logs = []
-    #
-    # users.each do |user|
-    #   leaving_date = user.leaving_date
-    #   if leaving_date.blank? || leaving_date > start_date
-    #     leaving_dates[user.id.to_s] = leaving_date if leaving_date.present? && leaving_date < end_date
-    #     log = Capacitylog.where(:user_id => user.id).where("created_at <= ?", start_date).order(:created_at).last
-    #     users_last_number[user.id.to_s] = log.capacity_number if log.present?
-    #
-    #     puts "***" + user.id.to_s
-    #
-    #     logs.concat Capacitylog.where(:user_id => user.id).where("created_at >= ? AND created_at < ?", start_date, leaving_date.blank? || leaving_date >= end_date ? end_date : leaving_date)
-    #
-    #   end
-    #
-    # end
-    #
+    users_last_number = {}
+    leaving_dates = {}
+    logs = []
+
+    users.each do |user|
+      leaving_date = user.leaving_date
+      if leaving_date.blank? || leaving_date > start_date
+        leaving_dates[user.id.to_s] = leaving_date if leaving_date.present? && leaving_date < end_date
+        log = Capacitylog.where(:user_id => user.id).where("created_at <= ?", start_date).order(:created_at).last
+        users_last_number[user.id.to_s] = log.capacity_number if log.present?
+
+        puts "***" + user.id.to_s
+
+        logs.concat Capacitylog.where(:user_id => user.id).where("created_at >= ? AND created_at < ?", start_date, leaving_date.blank? || leaving_date >= end_date ? end_date : leaving_date)
+
+      end
+
+    end
+
     # logs.sort_by! {|log| [ log[:created_at] ]}
     #
     # log_dates =[]
