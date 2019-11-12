@@ -62,15 +62,15 @@ module ApplicationHelper
 
     end
 
-    # logs.sort_by! {|log| [ log[:created_at] ]}
-    #
-    # log_dates =[]
-    #
-    # logs.each do |log|
-    #   puts "+++" + log.id.to_s
-    #   log_datetime = log.created_at.to_datetime
-    #   log_dates << log_datetime if !log_dates.include?(log_datetime)
-    # end
+    logs.sort_by! {|log| [ log[:created_at] ]}
+
+    log_dates =[]
+
+    logs.each do |log|
+      puts "+++" + log.id.to_s
+      log_datetime = log.created_at.to_datetime
+      log_dates << log_datetime if !log_dates.include?(log_datetime)
+    end
     #
     # current_date = start_date
     # xs_stg = ""
