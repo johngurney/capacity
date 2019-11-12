@@ -275,17 +275,32 @@ class UsersController < ApplicationController
     user = helpers.logged_in_user_helper
 
     #For an administrator user.effective_groups = Group.all, for a partner user.effective_groups = user.groups
+
+    #Chect at least one group remains selected
+
+    at_least_one_selected_flag = false
+
     user.effective_groups.each do |group|
-
-      lookup = Groupuserlookup.where(:user_id => user.id, :group_id => group.id).first
-      if lookup.blank?
-        user.groups << group
-        lookup = Groupuserlookup.where(:user_id => user.id, :group_id => group.id).first
+      if params["checkgroup" + group.id.to_s ] == "1"
+        at_least_one_selected_flag = true
+        break
       end
+    end
 
-      lookup.selected = params["checkgroup" + group.id.to_s ] == "1"
+    if at_least_one_selected_flag
 
-      lookup.save
+      user.effective_groups.each do |group|
+
+        lookup = Groupuserlookup.where(:user_id => user.id, :group_id => group.id).first
+        if lookup.blank?
+          user.groups << group
+          lookup = Groupuserlookup.where(:user_id => user.id, :group_id => group.id).first
+        end
+
+        lookup.selected = params["checkgroup" + group.id.to_s ] == "1"
+
+        lookup.save
+      end
     end
 
     # render "temp"

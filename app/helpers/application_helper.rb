@@ -115,6 +115,7 @@ module ApplicationHelper
 
   def graph_ticks(v)
 
+    v = 1 if v < 1
 
     oom = Math.log10(v.to_d).floor
     v1 = v.to_d / (10 ** oom)
