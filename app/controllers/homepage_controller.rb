@@ -25,10 +25,10 @@ class HomepageController < ApplicationController
 
   def history_all
     @users = []
-    get_users(false).each do |user|
+    get_users(false, true).each do |user|
       @users << user[:user]
     end
-    get_users(true).each do |user|
+    get_users(true, true).each do |user|
       @users << user[:user]
     end
 
@@ -99,7 +99,7 @@ class HomepageController < ApplicationController
 
   end
 
-  def get_users(is_asbent)
+  def get_users(is_asbent, include_leavers = false)
      users = []
      # User.all.each do |user|
      #   log = user.capacity_log
@@ -112,7 +112,7 @@ class HomepageController < ApplicationController
        if user.selected(group)
          group.users.each do |user|
            log = user.capacity_log
-           if user.is_user? && !user.has_left && user.check_search_criteria(@included_areas, @included_departments, @included_locations) && ((log.present? and log.absent) ^ !is_asbent) # ^ is xor
+           if user.is_user? && (include_leavers || !user.has_left) && user.check_search_criteria(@included_areas, @included_departments, @included_locations) && ((log.present? and log.absent) ^ !is_asbent) # ^ is xor
              users << {:user => user, :capacity_log => log, :capacity_number => (log.blank? ? 0 : log.capacity_number) }
            end
          end
@@ -186,10 +186,10 @@ class HomepageController < ApplicationController
       if user.is_user?
 
         prng = Random.new
-        date = Date.today
+        date = 2.years.ago + (prng.rand(5) == 1 ? prng.rand(600).days : 0.days)
         capacity_number = 3
 
-        (1..30).each do |n|
+        while date < Date.today
 
           capacity_number += rand(3) - 1
 
@@ -199,16 +199,36 @@ class HomepageController < ApplicationController
               capacity_number = 1
           end
 
-          no_days = prng.rand(14).to_i + 2
-          date -= no_days.days
-
           log = Capacitylog.new
           log.created_at = date
           log.capacity_number = capacity_number
           log.user_id = user.id
           log.absent = false
           log.save
+
+          no_days = prng.rand(14).to_i + 2
+          date += no_days.days
+
         end
+
+        if prng.rand(7) == 1
+
+          log = Capacitylog.where(:user_id => user.id).order(:created_at).last
+
+          if log.present?
+
+            return_date = date + prng.rand(14).to_i.days
+            while return_date.saturday? || return_date.sunday?
+              return_date += 1.days
+            end
+
+            log.return_date = return_date
+            log.absent = true
+            log.save
+          end
+
+        end
+
 
       end
     end

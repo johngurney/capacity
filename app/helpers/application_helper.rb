@@ -41,6 +41,8 @@ module ApplicationHelper
 
   def all_capacity_xs_and_ys(start_date, end_date, users)
 
+    test_stg = ""
+
     users_last_number = {}
     leaving_dates = {}
     logs = []
@@ -52,7 +54,7 @@ module ApplicationHelper
         log = Capacitylog.where(:user_id => user.id).where("created_at <= ?", start_date).order(:created_at).last
         users_last_number[user.id.to_s] = log.capacity_number if log.present?
 
-        logs.concat Capacitylog.where(:user_id => user.id).where("created_at >= ? AND created_at < ?", start_date, leaving_date.blank? ? end_date : leaving_dates)
+        logs.concat Capacitylog.where(:user_id => user.id).where("created_at >= ? AND created_at < ?", start_date, leaving_date.blank? || leaving_date >= end_date ? end_date : leaving_date)
 
       end
 
