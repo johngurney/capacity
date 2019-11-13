@@ -99,7 +99,7 @@ module ApplicationHelper
 
 
       logs.each do |log|
-        break if n1> 100
+        break if n1> 1000
         t= Time.now
         users_last_number[log.user_id.to_s] = log.capacity_number if log.created_at == date
         time_total += Time.now - t
