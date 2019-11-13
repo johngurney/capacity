@@ -67,7 +67,6 @@ module ApplicationHelper
     log_dates =[]
 
     logs.each do |log|
-      puts "+++" + log.id.to_s
       log_datetime = log.created_at.to_datetime
       log_dates << log_datetime if !log_dates.include?(log_datetime)
     end
@@ -77,6 +76,10 @@ module ApplicationHelper
     ys_stg = ""
     number_of_users = []
     total = 0
+
+    time_total = 0.0
+    n = 0
+
     actual_start_date = nil
 
     log_dates.each do |date|
@@ -92,8 +95,16 @@ module ApplicationHelper
         total += (date - current_date).to_f * avg
       end
 
+      n1 = 0
+
+
       logs.each do |log|
-        # users_last_number[log.user_id.to_s] = log.capacity_number if log.created_at == date
+        break if n1> 20
+        t= Time.now
+        users_last_number[log.user_id.to_s] = log.capacity_number if log.created_at == date
+        time_total += Time.now - t
+        n+=1
+        n1 += 1
       end
 
     #   leaving_dates.each do |user_id, leaving_date|
@@ -117,7 +128,7 @@ module ApplicationHelper
     #
     # actual_start_date = start_date if actual_start_date.blank?
     # return xs_stg, ys_stg, (total / (end_date - actual_start_date)).to_f.round(4).to_s, number_of_users_stg, number_of_users.max.to_s, graph_ticks(number_of_users.max)
-    return "", "", "", "", "", "", test_stg
+    return "", "", "", "", "", "", (time_total / n.to_d).to_s
   end
 
   def graph_ticks(v)
