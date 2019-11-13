@@ -93,7 +93,7 @@ module ApplicationHelper
       end
 
       logs.each do |log|
-        # users_last_number[log.user_id.to_s] = log.capacity_number if log.created_at == date
+        users_last_number[log.user_id.to_s] = log.capacity_number if log.created_at == date
       end
 
     #   leaving_dates.each do |user_id, leaving_date|
