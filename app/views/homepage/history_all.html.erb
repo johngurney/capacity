@@ -138,10 +138,10 @@
       ctx.stroke();
 
       ctx.textAlign = "right";
-      ctx.fillText("Average", x0 - 6, ypos + 4);
+      ctx.fillText(average_value, x0 - 6, ypos + 4);
 
       ctx.textAlign = "left";
-      ctx.fillText(average_value, xright + 6, ypos + 4 );
+      ctx.fillText("Average", xright + 6, ypos + 4 );
     }
 
     function check_users_on_off(v) {
@@ -154,7 +154,6 @@
 </script>
 <%= @test %>
 <h1>History</h1>
-<%= test_stg %>
 <div>
   <%= render "groups", :width => "100%" %>
 </div>
