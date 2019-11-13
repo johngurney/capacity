@@ -117,7 +117,7 @@ module ApplicationHelper
     #
     # actual_start_date = start_date if actual_start_date.blank?
     # return xs_stg, ys_stg, (total / (end_date - actual_start_date)).to_f.round(4).to_s, number_of_users_stg, number_of_users.max.to_s, graph_ticks(number_of_users.max)
-    return "", "", "", "", "", test_stg
+    return "", "", "", "", "", "", test_stg
   end
 
   def graph_ticks(v)
