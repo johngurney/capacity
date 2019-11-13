@@ -62,13 +62,12 @@ module ApplicationHelper
 
     logs.sort_by! {|log| [ log[:created_at] ]}
 
-    test_stg = logs.count.to_s
-
-    log_dates =[]
+    log_dates = {}
 
     logs.each do |log|
-      log_datetime = log.created_at.to_datetime
-      log_dates << log_datetime if !log_dates.include?(log_datetime)
+      log_datetime_stg = log.created_at.strftime("%e %b %Y")
+      log_dates[log_datetime_stg] = [] if !log_dates.key?(log_datetime_stg)
+      log_dates[log_datetime_stg] << [log.user_id, log.capacity_number]
     end
 
     current_date = start_date
@@ -82,10 +81,12 @@ module ApplicationHelper
 
     actual_start_date = nil
 
-    log_dates.each do |date|
+    log_dates.each do |key, logs|
+      date = Date.strptime(key, '%e %b %Y')
       xs_stg +=", " if xs_stg != ""
       ys_stg +=", " if ys_stg != ""
       avg = average_for_hash(users_last_number)
+
       if avg.present?
         actual_start_date = current_date if actual_start_date.blank?
         xs_stg += ((current_date - start_date).to_f / (end_date - start_date).to_f).round(4).to_s
@@ -97,38 +98,30 @@ module ApplicationHelper
 
       n1 = 0
 
-
       logs.each do |log|
-        break if n1> 100
-        t= Time.now
-        users_last_number[log.user_id.to_s] = log.capacity_number if log.created_at == date
-        time_total += Time.now - t
-        n+=1
-        n1 += 1
+        users_last_number[log[0].to_s] = log[1]
       end
 
-    #   leaving_dates.each do |user_id, leaving_date|
-    #     if leaving_date < date
-    #       users_last_number.delete(user_id)
-    #       leaving_dates.delete(user_id)
-    #     end
-    #   end
-    #
-    #   current_date = date
-    #
-    #   puts "$$$" + date.to_s
-    #
+      leaving_dates.each do |user_id, leaving_date|
+        if leaving_date < date
+          users_last_number.delete(user_id)
+          leaving_dates.delete(user_id)
+        end
+      end
+
+      current_date = date
+
     end
-    #
-    # number_of_users_stg = ""
-    # number_of_users.each do |n|
-    #   number_of_users_stg +=", " if number_of_users_stg != ""
-    #   number_of_users_stg += n.to_s
-    # end
-    #
-    # actual_start_date = start_date if actual_start_date.blank?
-    # return xs_stg, ys_stg, (total / (end_date - actual_start_date)).to_f.round(4).to_s, number_of_users_stg, number_of_users.max.to_s, graph_ticks(number_of_users.max)
-    return "", "", "", "", "", "", (time_total / n.to_d).to_s + " " + n.to_s
+
+    number_of_users_stg = ""
+    number_of_users.each do |n|
+      number_of_users_stg +=", " if number_of_users_stg != ""
+      number_of_users_stg += n.to_s
+    end
+
+    actual_start_date = start_date if actual_start_date.blank?
+    return xs_stg, ys_stg, (total / (end_date - actual_start_date)).to_f.round(4).to_s, number_of_users_stg, number_of_users.max.to_s, graph_ticks(number_of_users.max)
+    # return "", "", "", "", "", "", test_stg
   end
 
   def graph_ticks(v)
