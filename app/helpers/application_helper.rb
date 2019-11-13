@@ -41,7 +41,7 @@ module ApplicationHelper
 
   def all_capacity_xs_and_ys(start_date, end_date, users)
 
-    # test_stg = ""
+    test_stg = ""
     #
     users_last_number = {}
     leaving_dates = {}
@@ -54,8 +54,6 @@ module ApplicationHelper
         log = Capacitylog.where(:user_id => user.id).where("created_at <= ?", start_date).order(:created_at).last
         users_last_number[user.id.to_s] = log.capacity_number if log.present?
 
-        puts "***" + user.id.to_s
-
         logs.concat Capacitylog.where(:user_id => user.id).where("created_at >= ? AND created_at < ?", start_date, leaving_date.blank? || leaving_date >= end_date ? end_date : leaving_date)
 
       end
@@ -63,6 +61,8 @@ module ApplicationHelper
     end
 
     logs.sort_by! {|log| [ log[:created_at] ]}
+
+    test_stg = logs.count.to_s
 
     log_dates =[]
 
@@ -93,7 +93,7 @@ module ApplicationHelper
       end
 
       logs.each do |log|
-        users_last_number[log.user_id.to_s] = log.capacity_number if log.created_at == date
+        # users_last_number[log.user_id.to_s] = log.capacity_number if log.created_at == date
       end
 
     #   leaving_dates.each do |user_id, leaving_date|
@@ -117,7 +117,7 @@ module ApplicationHelper
     #
     # actual_start_date = start_date if actual_start_date.blank?
     # return xs_stg, ys_stg, (total / (end_date - actual_start_date)).to_f.round(4).to_s, number_of_users_stg, number_of_users.max.to_s, graph_ticks(number_of_users.max)
-    return "", "", "", "", ""
+    return "", "", "", "", "", test_stg
   end
 
   def graph_ticks(v)

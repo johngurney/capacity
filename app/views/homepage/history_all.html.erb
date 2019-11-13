@@ -12,7 +12,7 @@
 
       months = [<%= months(logged_in_user_helper.history_start_date.to_datetime, logged_in_user_helper.history_end_date.to_datetime).html_safe %>];
 
-      <% xs_stg, ys_stg, avg, number_of_users, max_number_of_users, number_of_user_graph_ticks = all_capacity_xs_and_ys(logged_in_user_helper.history_start_date.to_datetime, logged_in_user_helper.history_end_date.to_datetime, @users - @deselected_users) %>
+      <% xs_stg, ys_stg, avg, number_of_users, max_number_of_users, number_of_user_graph_ticks, test_stg = all_capacity_xs_and_ys(logged_in_user_helper.history_start_date.to_datetime, logged_in_user_helper.history_end_date.to_datetime, @users - @deselected_users) %>
 
       xs = [<%= xs_stg.html_safe %> ];
       ys = [<%= ys_stg.html_safe %> ];
@@ -154,7 +154,7 @@
 </script>
 <%= @test %>
 <h1>History</h1>
-
+<%= test_stg %>
 <div>
   <%= render "groups", :width => "100%" %>
 </div>
