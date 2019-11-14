@@ -140,8 +140,14 @@ class HomepageController < ApplicationController
   def test
 
     User.all.each do |user|
+
+      lit_group = Group.where(:name ="Litigation").first
+
       puts "***" + user.user_type
+      user.groups << lit_group if user.groups.count == 0
+
       if user.user_type == "Partner" ||  (user.position.present? && user.position.downcase.include?("partner") && user.user_type != "Administrator")
+        user.set_selected(lit_group,true) if !user.selected(lit_group)
         user.user_type = "Observer"
         puts "+++" + user.user_type
         user.save
