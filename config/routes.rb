@@ -42,8 +42,8 @@ Rails.application.routes.draw do
   get 'search_aois' => 'homepage#search_aois', as: :search_aois
 
   get 'passwords' => 'users#passwords', as: :passwords
-  post 'make_password/.:id' => 'users#make_password', as: :make_password
-  post 'make_all_passwords' => 'users#make_all_passwords', as: :make_all_passwords
+  post 'make_passwords' => 'users#make_passwords', as: :make_passwords
+
   get 'history/.:id' => 'users#history', as: :history
 
   get 'selected_history' => 'users#selected_history', as: :selected_history

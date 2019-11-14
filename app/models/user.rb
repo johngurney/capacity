@@ -1,3 +1,5 @@
+require 'bcrypt'
+
 class User < ApplicationRecord
   has_and_belongs_to_many :areas
   belongs_to :department, optional: true
@@ -7,6 +9,8 @@ class User < ApplicationRecord
   has_many :groups, through: :groupuserlookups
 
   has_many :objectives
+
+  include BCrypt
 
   def name
     self.first_name.to_s + " " + self.last_name.to_s
@@ -97,8 +101,10 @@ class User < ApplicationRecord
 
   def make_password
     prng = Random.new
-    self.password = Location.all.limit(1).offset(prng.rand(Location.all.count)).first.name + prng.rand(9999).to_i.to_s
+    password = Location.all.limit(1).offset(prng.rand(Location.all.count)).first.name + prng.rand(9999).to_i.to_s
+    self.password = password
     self.save(:validate => false)
+    return password
   end
 
   def capacity_ys(start_date, end_date)
@@ -372,5 +378,12 @@ class User < ApplicationRecord
 
   end
 
+  def password
+    @password ||= Password.new(password_hash)
+  end
 
+  def password=(new_password)
+    @password = Password.create(new_password)
+    self.password_hash = @password
+  end
 end

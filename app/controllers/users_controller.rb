@@ -176,12 +176,35 @@ class UsersController < ApplicationController
   end
 
   def passwords
+    get_users_for_passwords
+  end
+
+  def get_users_for_passwords
+    @users = []
+
+    user = logged_in_user_helper
+
+    user.groups.each do |group|
+      if user.selected(group)
+        group.users.each do |user|
+          @users << user
+        end
+      end
+    end
+
+    @users.uniq!
+
+    @users.sort_by! {|user| [user.last_name, user.first_name] }
   end
 
 
-  def make_password
-    @user.make_password
-    redirect_to passwords_path
+  def make_passwords
+    @passwords = []
+    get_users_for_passwords
+    @users.each do |user|
+      @passwords << {:name => user.name, :password => user.make_password} if params["check_user" + user.id.to_s]  == "1"
+    end
+    render "show_passwords"
   end
 
 
