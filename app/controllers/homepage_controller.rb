@@ -141,7 +141,7 @@ class HomepageController < ApplicationController
 
     User.all.each do |user|
 
-      lit_group = Group.where(:name ="Litigation").first
+      lit_group = Group.where(:name => "Litigation").first
 
       puts "***" + user.user_type
       user.groups << lit_group if user.groups.count == 0
