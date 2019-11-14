@@ -131,7 +131,7 @@ class UsersController < ApplicationController
           end
 
 
-          user.user_type = (user.position.downcase.to_s.include?("partner") ? "Partner" : "User")
+          user.user_type = (user.position.downcase.to_s.include?("partner") ? "Observer" : "User")
 
           user.check_groups
 
@@ -269,12 +269,12 @@ class UsersController < ApplicationController
   end
 
   def select_groups
-    #This applies only to partners and administrators
+    #This applies only to observers and administrators
     #This sets the groups to which the logged_on_user has selected, that is the ones to which he or she views as any particiular time
     #This can be set by the user
     user = helpers.logged_in_user_helper
 
-    #For an administrator user.effective_groups = Group.all, for a partner user.effective_groups = user.groups
+    #For an administrator user.effective_groups = Group.all, for a observer user.effective_groups = user.groups
 
     #Chect at least one group remains selected
 

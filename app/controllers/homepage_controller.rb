@@ -10,8 +10,8 @@ class HomepageController < ApplicationController
     @absent_users = get_users(true)
     get_emails
 
-    if logged_in_user_helper.is_partner? or mobile?
-      render mobile? ? 'partner_mobile'  :'partner_homepage'
+    if logged_in_user_helper.is_observer? or mobile?
+      render mobile? ? 'observer_mobile'  :'observer_homepage'
       return
     end
 
@@ -139,9 +139,14 @@ class HomepageController < ApplicationController
 
   def test
 
-    # User.all.each do |user|
-    #   user.check_groups
-    #  end
+    User.all.each do |user|
+      puts "***" + user.user_type
+      if user.user_type == "Partner" ||  (user.position.present? && user.position.downcase.include?("partner") && user.user_type != "Administrator")
+        user.user_type = "Observer"
+        puts "+++" + user.user_type
+        user.save
+      end
+    end
 
 
     # Area.all.each do |area|
@@ -180,58 +185,58 @@ class HomepageController < ApplicationController
     # end
 
 
-    Capacitylog.delete_all
+    # Capacitylog.delete_all
+    #
+    # User.all.each do |user|
+    #   if user.is_user?
+    #
+    #     prng = Random.new
+    #     date = 2.years.ago + (prng.rand(5) == 1 ? prng.rand(600).days : 0.days)
+    #     capacity_number = 3
+    #
+    #     while date < Date.today
+    #
+    #       capacity_number += rand(3) - 1
+    #
+    #       if capacity_number > 4
+    #         capacity_number = 4
+    #       elsif capacity_number < 1
+    #           capacity_number = 1
+    #       end
+    #
+    #       log = Capacitylog.new
+    #       log.created_at = date
+    #       log.capacity_number = capacity_number
+    #       log.user_id = user.id
+    #       log.absent = false
+    #       log.save
+    #
+    #       no_days = prng.rand(14).to_i + 2
+    #       date += no_days.days
+    #
+    #     end
+    #
+    #     if prng.rand(7) == 1
+    #
+    #       log = Capacitylog.where(:user_id => user.id).order(:created_at).last
+    #
+    #       if log.present?
+    #
+    #         return_date = date + prng.rand(14).to_i.days
+    #         while return_date.saturday? || return_date.sunday?
+    #           return_date += 1.days
+    #         end
+    #
+    #         log.return_date = return_date
+    #         log.absent = true
+    #         log.save
+    #       end
+    #
+    #     end
 
-    User.all.each do |user|
-      if user.is_user?
 
-        prng = Random.new
-        date = 2.years.ago + (prng.rand(5) == 1 ? prng.rand(600).days : 0.days)
-        capacity_number = 3
-
-        while date < Date.today
-
-          capacity_number += rand(3) - 1
-
-          if capacity_number > 4
-            capacity_number = 4
-          elsif capacity_number < 1
-              capacity_number = 1
-          end
-
-          log = Capacitylog.new
-          log.created_at = date
-          log.capacity_number = capacity_number
-          log.user_id = user.id
-          log.absent = false
-          log.save
-
-          no_days = prng.rand(14).to_i + 2
-          date += no_days.days
-
-        end
-
-        if prng.rand(7) == 1
-
-          log = Capacitylog.where(:user_id => user.id).order(:created_at).last
-
-          if log.present?
-
-            return_date = date + prng.rand(14).to_i.days
-            while return_date.saturday? || return_date.sunday?
-              return_date += 1.days
-            end
-
-            log.return_date = return_date
-            log.absent = true
-            log.save
-          end
-
-        end
-
-
-      end
-    end
+      # end
+    # end
 
     # User.all.each do |user|
     #   if user.user_type.blank?
@@ -243,7 +248,9 @@ class HomepageController < ApplicationController
     #   end
     # end
 
-    redirect_to root_path
+    render "temp"
+
+    # redirect_to root_path
 
 
     # user = User.all.where(:last_name => "Tench").first
@@ -295,7 +302,7 @@ class HomepageController < ApplicationController
       get_emails
 
 
-    render "partner_homepage"
+    render "observer_homepage"
     end
   end
 

@@ -179,12 +179,12 @@ class User < ApplicationRecord
     !self.user_type.blank? && (self.user_type == "Administrator")
   end
 
-  def is_partner?
-    !self.user_type.blank? && (self.user_type == "Partner")
+  def is_observer?
+    !self.user_type.blank? && (self.user_type == "Observer")
   end
 
-  def is_admin_or_partner?
-    self.is_admin? || self.is_partner?
+  def is_admin_or_observer?
+    self.is_admin? || self.is_observer?
   end
 
   def is_user?
@@ -284,14 +284,14 @@ class User < ApplicationRecord
   def check_groups
     #To be called when user made or amended to ensure groups correct
     #For any user there must be at least one group for the user
-    #For any partner there must be at least one group for the user and at least one must be selected
+    #For any observer there must be at least one group for the user and at least one must be selected
     #Any administrator must have all groups and at least one must be selected
-    #NB For any partner (or administrator), groups are set by an Administrator and set the users which can be seen, selected groups are set the partner
+    #NB For any observer (or administrator), groups are set by an Administrator and set the users which can be seen, selected groups are set the observer
 
     if self.is_user?
       self.groups << Group.first if self.groups.count == 0
 
-    elsif self.is_partner?
+    elsif self.is_observer?
       self.groups << Group.first if self.groups.count == 0
       self.ensure_one_group_selected
 

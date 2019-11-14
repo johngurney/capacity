@@ -48,7 +48,7 @@
       <td>User type</td>
       <td>
         <div class="flex_row">
-          <%= form.select :user_type, ["Administrator", "Partner", "User"],{:include_blank => "None"}, {class: "small_field" , style: "width: 150px", onchange: "set_manager_checkbox(this.value)" }%>
+          <%= form.select :user_type, ["Administrator", "Observer", "User"],{:include_blank => "None"}, {class: "small_field" , style: "width: 150px", onchange: "set_manager_checkbox(this.value)" }%>
           <div id="manager_checkbox" style="height: 28px; margin-left:10px; border-radius: 10px; padding: 0px 20px 0px 20px; border: 3px solid blue; display: <%= user.is_user? ? "none" : "block" %>">Manager<%= form.check_box :is_manager, :style => "margin-left:10px; margin-top: 4px; height: 16px; width: 16px" %></div>
         </div>
       </td>
