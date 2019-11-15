@@ -386,4 +386,30 @@ class User < ApplicationRecord
     @password = Password.create(new_password)
     self.password_hash = @password
   end
+
+  def email1
+    decrypt(self.email_encrypted)
+  end
+
+  def email1=(new_email)
+    self.email_encrypted = encrypt(new_email)
+  end
+
+  def first_name1
+    decrypt(self.first_name_encrypted)
+  end
+
+  def first_name1=(new_first_name)
+    self.first_name_encrypted = encrypt(new_first_name)
+  end
+
+  def last_name1
+    decrypt(self.last_name_encrypted)
+  end
+
+  def last_name1=(new_last_name)
+    self.last_name_encrypted = encrypt(new_last_name)
+  end
+
+
 end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_11_14_081838) do
+ActiveRecord::Schema.define(version: 2019_11_15_073956) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -103,6 +103,9 @@ ActiveRecord::Schema.define(version: 2019_11_14_081838) do
     t.boolean "is_manager"
     t.date "leaving_date"
     t.string "password_hash"
+    t.string "first_name_encrypted"
+    t.string "last_name_encrypted"
+    t.string "email_encrypted"
   end
 
 end
