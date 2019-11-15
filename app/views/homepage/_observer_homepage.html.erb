@@ -98,7 +98,7 @@
   </tr>
   <% if @non_absent_users %>
     <% @non_absent_users.each do |user| %>
-    <tr >
+    <tr style="backcolor: red">
       <td>
         <%= link_to user[:user].name, user_path(user[:user]) %>
       </td>

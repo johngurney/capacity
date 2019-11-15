@@ -1,6 +1,8 @@
 class ApplicationRecord < ActiveRecord::Base
   self.abstract_class = true
   def encrypt(unencrypted_content)
+    puts "*** 1 *** " + Rails.application.secrets.secret_key_base
+    puts "*** 2 *** " + Rails.configuration.encryption_salt
     key   = ActiveSupport::KeyGenerator.new(Rails.application.secrets.secret_key_base).generate_key Rails.configuration.encryption_salt, Rails.configuration.encryption_key_length
     crypt = ActiveSupport::MessageEncryptor.new(key)
     crypt.encrypt_and_sign(unencrypted_content)
