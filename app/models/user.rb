@@ -392,6 +392,7 @@ class User < ApplicationRecord
   end
 
   def email1=(new_email)
+    puts "****" + new_email.to_s
     self.email_encrypted = encrypt(new_email)
   end
 
