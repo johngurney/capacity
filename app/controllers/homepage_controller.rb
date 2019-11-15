@@ -155,7 +155,7 @@ class HomepageController < ApplicationController
     # end
 
     User.all.each do |user|
-      user.email1 = user.email.to_s
+      user.email1 = "aa" #user.email.to_s
       user.first_name1 = user.first_name.to_s
       user.last_name1 = user.last_name.to_s
       user.save
