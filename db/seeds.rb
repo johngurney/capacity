@@ -60,5 +60,3 @@ Department.delete_all
 departments.each do |dept|
   Department.create(:name => dept, :group_id => lit_group_id)
 end
-
-# User.create(:first_name => "Admin", :last_name => "User", :user_type = "Administrator")

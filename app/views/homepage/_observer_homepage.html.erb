@@ -96,9 +96,10 @@
       Comments / <scan style="color:red">objectives / desired work</scan>
     </td>
   </tr>
+  <% max_capacity_number = Capacitycode.maximum(:capacity_number) %>
   <% if @non_absent_users %>
     <% @non_absent_users.each do |user| %>
-    <tr style="backcolor: red">
+    <tr style="background-color: rgba(<%= (user[:capacity_number] * 255 / max_capacity_number).to_s %>, 0, <%= ((max_capacity_number - user[:capacity_number]) * 255 / max_capacity_number).to_s %>,0.2)">
       <td>
         <%= link_to user[:user].name, user_path(user[:user]) %>
       </td>
@@ -173,7 +174,7 @@
   </tr>
   <% if @absent_users %>
     <% @absent_users.each do |user| %>
-    <tr >
+    <tr style="background-color: rgba(<%= (user[:capacity_number] * 255 / max_capacity_number).to_s %>, 0, <%= ((max_capacity_number - user[:capacity_number]) * 255 / max_capacity_number).to_s %>,0.2)">
       <td>
         <%= link_to user[:user].name, user_path(user[:user]) %>
       </td>

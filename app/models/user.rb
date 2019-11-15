@@ -387,28 +387,28 @@ class User < ApplicationRecord
     self.password_hash = @password
   end
 
-  def email1
+  def email
     decrypt(self.email_encrypted)
   end
 
-  def email1=(new_email)
+  def email=(new_email)
     puts "****" + new_email.to_s
     self.email_encrypted = encrypt(new_email)
   end
 
-  def first_name1
+  def first_name
     decrypt(self.first_name_encrypted)
   end
 
-  def first_name1=(new_first_name)
+  def first_name=(new_first_name)
     self.first_name_encrypted = encrypt(new_first_name)
   end
 
-  def last_name1
+  def last_name
     decrypt(self.last_name_encrypted)
   end
 
-  def last_name1=(new_last_name)
+  def last_name=(new_last_name)
     self.last_name_encrypted = encrypt(new_last_name)
   end
 

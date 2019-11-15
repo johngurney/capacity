@@ -13,7 +13,7 @@ class UsersController < ApplicationController
         end
       end
       @users.uniq!
-      @users.sort_by! {|user| [user[:last_name], user[:first_name]] }
+      @users.sort_by! {|user| [user[:alpha_order]] }
     end
 
   end
@@ -48,7 +48,7 @@ class UsersController < ApplicationController
     logged_in_user_helper.groups.each do |group|
       @user.groups << group
     end
-
+    alphasort_users
     redirect_to @user
 
   end
@@ -62,7 +62,7 @@ class UsersController < ApplicationController
     @user.location = Location.find( params[:user][:location].to_i ) if params[:user][:location].to_i > 0
     @user.save
     @user.check_groups
-
+    alphasort_users
     redirect_to @user
 
   end
@@ -72,6 +72,7 @@ class UsersController < ApplicationController
   # DELETE /users/1.json
   def destroy
     @user.destroy
+    alphasort_users
     respond_to do |format|
       format.html { redirect_to users_url, notice: 'User was successfully destroyed.' }
       format.json { head :no_content }
@@ -142,6 +143,7 @@ class UsersController < ApplicationController
         end
 
       end
+      alphasort_users
     end
 
     redirect_to users_path

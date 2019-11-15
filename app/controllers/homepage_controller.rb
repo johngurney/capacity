@@ -69,7 +69,7 @@ class HomepageController < ApplicationController
   end
 
   def ad_admin
-    User.create(:first_name => "Admin", :last_name => "User", :user_type => "Administrator")
+    create_administrator
     redirect_to root_path
 
   end
@@ -121,7 +121,7 @@ class HomepageController < ApplicationController
 
      users.uniq!
 
-     users.sort_by {|user| [user[:capacity_number], user[:user][:last_name], user[:user][:first_name]] }
+     users.sort_by {|user| [user[:capacity_number], user[:user][:alpha_order]] }
 
   end
 

@@ -99,4 +99,29 @@ class ApplicationController < ActionController::Base
     @browser.mobile? #|| true
   end
 
+  def alphasort_users
+    users = []
+    User.all.each do |user|
+      users << {:id => user.id, :first_name => user.first_name, :last_name => user.last_name}
+    end
+
+    users.sort_by! {|user| [user[:last_name], user[:first_name]]}
+    n = 1
+
+    users.each  do |user|
+      User.update(user[:id], :alpha_order => n)
+      puts n.to_s + " - " + user[:last_name] + ": " + user[:id].to_s
+      n += 1
+    end
+  end
+
+  def create_administrator
+    user = User.new
+    user.first_name = "Admin"
+    user.last_name = "User"
+    user.user_type = "Administrator"
+    user.email = ""
+    user.save
+  end
+
 end
