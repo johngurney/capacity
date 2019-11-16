@@ -101,7 +101,7 @@ class User < ApplicationRecord
 
   def make_password
     prng = Random.new
-    password = Location.all.limit(1).offset(prng.rand(Location.all.count)).first.name + prng.rand(9999).to_i.to_s
+    password = Location.all.limit(1).offset(prng.rand(Location.all.count)).first.name + ("000" + prng.rand(9999).to_i.to_s)[-4..-1]
     self.password = password
     self.save(:validate => false)
     return password
