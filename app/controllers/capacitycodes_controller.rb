@@ -25,6 +25,7 @@ class CapacitycodesController < ApplicationController
   # POST /capacitycodes.json
   def create
     @capacitycode = Capacitycode.new(capacitycode_params)
+    @capacitycode.save
     redirect_to capacitycodes_path
   end
 
