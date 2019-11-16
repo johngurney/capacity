@@ -44,7 +44,7 @@
 <h1>You are in <%= user.groups.first.name %></h1>
 <% if Capacitylog.where(:user_id => user.id).count > 0 %>
   <% log = Capacitylog.where(:user_id => user.id).order(:created_at).last %>
-  <h2 style="color: orange; margin-bottom: 0px";>Current capacity: <%= log.capacity_number.to_s %> - logged at <%= log.created_at.strftime("%d %b %Y at %H:%M") %></h2>
+  <h2 style="color: orange; margin-bottom: 0px";>Current capacity: <%= log.capacity_number.to_s %> - logged at <%= log.created_at.strftime(""%e %B %Y at %l:%M%P") %></h2>
 <br/><br/>
 <% end %>
 
