@@ -112,42 +112,44 @@ class UsersController < ApplicationController
           flag=true
         else
 
-          # user = User.new
-          # if first_name_column >= 0
-          #   user.first_name = values[first_name_column]
-          # end
-          # if last_name_column >= 0
-          #   user.last_name  = values[last_name_column]
-          # end
-          # if position_column >= 0
-          #   user.position   = values[position_column]
-          # end
-          #
-          # if tel_number_column >= 0
-          #   user.telephone   = values[tel_number_column]
-          # end
-          #
-          # if email_address_column >= 0
-          #   user.email   = values[email_address_column]
-          # end
-          #
-          #
-          # user.user_type = (user.position.downcase.to_s.include?("partner") ? "Observer" : "User")
-          #
-          # user.check_groups
-          #
-          #
-          # user.save if User.where("lower(email) = ?", user.email.downcase).count == 0
-          #
-          # user.groups << group
-
-          User.all.each do |user|
-            if user.first_name == values[first_name_column] && user.last_name == values[last_name_column]
-              user.email = values[email_address_column]
-              user.save
-              break
-            end
+          user = User.new
+          if first_name_column >= 0
+            user.first_name = values[first_name_column]
           end
+          if last_name_column >= 0
+            user.last_name  = values[last_name_column]
+          end
+          if position_column >= 0
+            user.position   = values[position_column]
+          end
+
+          if tel_number_column >= 0
+            user.telephone   = values[tel_number_column]
+          end
+
+          if email_address_column >= 0
+            user.email   = values[email_address_column]
+          end
+
+
+          user.user_type = (user.position.downcase.to_s.include?("partner") ? "Observer" : "User")
+
+          user.check_groups
+
+
+          user.save if User.where("lower(email) = ?", user.email.downcase).count == 0
+
+          user.groups << group
+
+          #This code is just to replace email addresses
+
+          # User.all.each do |user|
+          #   if user.first_name == values[first_name_column] && user.last_name == values[last_name_column]
+          #     user.email = values[email_address_column]
+          #     user.save
+          #     break
+          #   end
+          # end
 
 
 
