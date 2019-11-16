@@ -23,7 +23,6 @@ class ApplicationController < ActionController::Base
     session[:logged_in_user] = nil if !session[:logged_in_user].blank? && !User.exists?(id: session[:logged_in_user].to_i)
 
     if session[:logged_in_user].blank?
-      puts "*********" + cookies[:logged_in_token]
       log = Loginlog.where(:token => cookies[:logged_in_token].to_s).first
       if cookies[:logged_in_token].blank? or log.blank? or !User.exists?(id:log.user_id)
         render 'general/password'
