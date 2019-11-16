@@ -65,10 +65,10 @@
 <% multi_groups_flag = logged_in_user_helper.multi_selected_groups %>
 
 <table width="100%" >
-  <col width="40%">
+  <col width="25%">
   <col width="10%">
-  <col width="10%">
-  <col width="40%">
+  <col width="30%">
+  <col width="30%">
   <tr style="font-weight: bold">
     <td>
       Name
@@ -83,10 +83,11 @@
       Comments / <scan style="color:red">objectives / desired work</scan>
     </td>
   </tr>
+  <% max_capacity_number = Capacitycode.maximum(:capacity_number) %>
   <% if @non_absent_users %>
     <% @non_absent_users.each do |user| %>
-    <tr >
-      <td>
+    <tr <%= colour(user[:capacity_number], max_capacity_number) %>>
+    <td>
         <%= link_to user[:user].name, user_path(user[:user]) %>
       </td>
       <td>
@@ -99,7 +100,7 @@
       </td>
       <td>
         <% if !user[:capacity_log].blank? %>
-          <%= user[:capacity_log].comment %>
+          <%= user[:capacity_log].com ment %>
         <% end %>
         <scan style="color:red"><%= user[:user].last_objective %></scan>
       </td>
@@ -112,10 +113,10 @@
 <h2 style="margin-top: 30px">Absent users</h2>
 
 <table width="100%" >
-  <col width="40%">
+  <col width="25%">
   <col width="10%">
-  <col width="10%">
-  <col width="40%">
+  <col width="30%">
+  <col width="30%">
   <tr style="font-weight: bold">
     <td>
       Name
@@ -132,7 +133,7 @@
   </tr>
   <% if @absent_users %>
     <% @absent_users.each do |user| %>
-    <tr >
+    <tr <%= colour(user[:capacity_number], max_capacity_number) %>>
       <td>
         <%= link_to user[:user].name, user_path(user[:user]) %>
       </td>

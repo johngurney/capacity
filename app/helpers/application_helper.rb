@@ -157,5 +157,10 @@ module ApplicationHelper
 
   end
 
+  def colour(capacity_number, max_capacity_number)
+    ("style=\"background-color: rgba(" + (capacity_number * 255 / max_capacity_number).to_s + ", 0, " + ((max_capacity_number - capacity_number) * 255 / max_capacity_number).to_s + ",0.2)\"").html_safe
+  end
+
+
 
 end

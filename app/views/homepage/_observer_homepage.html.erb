@@ -102,7 +102,7 @@
   <% max_capacity_number = Capacitycode.maximum(:capacity_number) %>
   <% if @non_absent_users %>
     <% @non_absent_users.each do |user| %>
-    <tr style="background-color: rgba(<%= (user[:capacity_number] * 255 / max_capacity_number).to_s %>, 0, <%= ((max_capacity_number - user[:capacity_number]) * 255 / max_capacity_number).to_s %>,0.2)">
+    <tr <%= colour(user[:capacity_number], max_capacity_number) %>>
       <td>
         <%= link_to user[:user].name, user_path(user[:user]) %>
       </td>
@@ -179,7 +179,7 @@
   </tr>
   <% if @absent_users %>
     <% @absent_users.each do |user| %>
-    <tr style="background-color: rgba(<%= (user[:capacity_number] * 255 / max_capacity_number).to_s %>, 0, <%= ((max_capacity_number - user[:capacity_number]) * 255 / max_capacity_number).to_s %>,0.2)">
+    <tr <%= colour(user[:capacity_number], max_capacity_number) %>>
       <td>
         <%= link_to user[:user].name, user_path(user[:user]) %>
       </td>
