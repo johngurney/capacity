@@ -1,8 +1,8 @@
 class ApplicationController < ActionController::Base
 
   before_action :check_cookie_consent, except: [:test, :cookie_consent, :log_in, :contact_sheet, :cheat_log_in, :set_allow_cheat_logon, :set_objective, :reset_cookie_consent]
-  before_action :check_logged_in, except: [:test, :cookie_consent, :log_in, :contact_sheet, :cheat_log_in, :set_allow_cheat_logon, :set_objective, :reset_cookie_consent]
-  before_action :check_admin, except: [:test, :cookie_consent, :log_in, :contact_sheet, :cheat_log_in, :homepage, :show, :search_aois, :amend_aois, :capacity_log, :history, :selected_history, :history_all, :set_allow_cheat_logon, :select_groups, :set_objective, :reset_cookie_consent]
+  before_action :check_logged_in, except: [:test, :cookie_consent, :log_in, :log_out, :contact_sheet, :cheat_log_in, :set_allow_cheat_logon, :set_objective, :reset_cookie_consent]
+  before_action :check_admin, except: [:test, :cookie_consent, :log_in, :log_out, :contact_sheet, :cheat_log_in, :homepage, :show, :search_aois, :amend_aois, :capacity_log, :history, :selected_history, :history_all, :set_allow_cheat_logon, :select_groups, :set_objective, :reset_cookie_consent]
 
   def check_cookie_consent
     if session[:cookie_consent].blank?
@@ -23,6 +23,7 @@ class ApplicationController < ActionController::Base
     session[:logged_in_user] = nil if !session[:logged_in_user].blank? && !User.exists?(id: session[:logged_in_user].to_i)
 
     if session[:logged_in_user].blank?
+      puts "*********" + cookies[:logged_in_token]
       log = Loginlog.where(:token => cookies[:logged_in_token].to_s).first
       if cookies[:logged_in_token].blank? or log.blank? or !User.exists?(id:log.user_id)
         render 'general/password'
@@ -37,7 +38,6 @@ class ApplicationController < ActionController::Base
     User.all.count > 0 && User.where(:user_type => "Administrator").count > 0
   end
 
-
   def check_admin
     if logged_in_user_helper.present? && !logged_in_user_helper.is_admin? && check_if_admins_exist?
       redirect_to root_path
@@ -45,7 +45,6 @@ class ApplicationController < ActionController::Base
     end
 
   end
-
 
   def telephone_link(tel_no)
       tel_no_mod = tel_no.to_s.scan(/(?:^\+)?\d+/)

@@ -52,12 +52,18 @@ class HomepageController < ApplicationController
   end
 
   def log_in
-    email = params[:email]
+    email = params[:email].downcase
     if !email.blank?
-      user = User.where(:email => email).first
+      user = nil
+      User.all.each do |user1|
+        if user1.email.downcase == email
+          user = user1
+          break
+        end
+      end
       if !user.blank?
-        if params[:password] == user.password
-          cookies.permanent.signed[:logged_in_user] = user
+        if user.password == params[:password]
+          cookies.permanent[:logged_in_token] = user.login if !user.blank?
           session[:logged_in_user] = user.id
           redirect_to root_path
           return
@@ -85,6 +91,7 @@ class HomepageController < ApplicationController
 
   def log_out
 
+    Loginlog.where(:token => cookies.permanent[:logged_in_token].to_s).delete_all
     cookies.permanent[:logged_in_token] = nil
     session[:logged_in_user] = nil
     redirect_to root_path
