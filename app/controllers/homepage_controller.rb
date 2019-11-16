@@ -154,12 +154,26 @@ class HomepageController < ApplicationController
     #   end
     # end
 
-    User.all.each do |user|
-      user.email1 = "aa" #user.email.to_s
-      user.first_name1 = user.first_name.to_s
-      user.last_name1 = user.last_name.to_s
-      user.save
+    # User.all.each do |user|
+    #   user.email = user.email.to_s
+    #   user.first_name = user.first_name.to_s
+    #   user.last_name = user.last_name.to_s
+    #   user.save
+    # end
+    stg = encrypt("Dan")
+
+
+    t = Time.now
+    # (1..58).each do
+    #     stg1 = decrypt(stg)
+    # end
+
+    #
+    User.all.order(:alpha_order).each do |user|
+      stg = user.name
     end
+
+    @t_elapsed = Time.now - t
 
 
     # Area.all.each do |area|
@@ -261,7 +275,7 @@ class HomepageController < ApplicationController
     #   end
     # end
 
-    render "temp"
+    render "temp" #, :layout => false
 
     # redirect_to root_path
 

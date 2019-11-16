@@ -1,8 +1,8 @@
 class ApplicationController < ActionController::Base
 
-  before_action :check_cookie_consent, except: [:cookie_consent, :log_in, :contact_sheet, :cheat_log_in, :set_allow_cheat_logon, :set_objective, :reset_cookie_consent]
-  before_action :check_logged_in, except: [:cookie_consent, :log_in, :contact_sheet, :cheat_log_in, :set_allow_cheat_logon, :set_objective, :reset_cookie_consent]
-  before_action :check_admin, except: [:cookie_consent, :log_in, :contact_sheet, :cheat_log_in, :homepage, :show, :search_aois, :amend_aois, :capacity_log, :history, :selected_history, :history_all, :set_allow_cheat_logon, :select_groups, :set_objective, :reset_cookie_consent]
+  before_action :check_cookie_consent, except: [:test, :cookie_consent, :log_in, :contact_sheet, :cheat_log_in, :set_allow_cheat_logon, :set_objective, :reset_cookie_consent]
+  before_action :check_logged_in, except: [:test, :cookie_consent, :log_in, :contact_sheet, :cheat_log_in, :set_allow_cheat_logon, :set_objective, :reset_cookie_consent]
+  before_action :check_admin, except: [:test, :cookie_consent, :log_in, :contact_sheet, :cheat_log_in, :homepage, :show, :search_aois, :amend_aois, :capacity_log, :history, :selected_history, :history_all, :set_allow_cheat_logon, :select_groups, :set_objective, :reset_cookie_consent]
 
   def check_cookie_consent
     if session[:cookie_consent].blank?
@@ -123,5 +123,25 @@ class ApplicationController < ActionController::Base
     user.email = ""
     user.save
   end
+
+
+  def encrypt(unencrypted_content)
+    make_crypt
+    @crypt.encrypt_and_sign(unencrypted_content)
+  end
+
+  def decrypt(encrypted_content)
+    make_crypt
+    @crypt.decrypt_and_verify(encrypted_content)
+  end
+
+  def make_crypt
+    if @crypt.blank?
+      key   = ActiveSupport::KeyGenerator.new(Rails.application.secrets.secret_key_base).generate_key Rails.configuration.encryption_salt, Rails.configuration.encryption_key_length
+      @crypt = ActiveSupport::MessageEncryptor.new(key)
+    end
+
+  end
+
 
 end
