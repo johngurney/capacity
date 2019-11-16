@@ -54,7 +54,7 @@
 
   <tr>
     <td>Telephone</td>
-    <td><%= link_to @user.telephone, "tel:" + @user.telephone %></td>
+    <td><%= link_to @user.telephone, "tel:" + @user.telephone.to_s %></td>
   </tr>
   <tr>
     <td>Email address</td>
