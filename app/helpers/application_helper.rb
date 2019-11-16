@@ -52,7 +52,7 @@ module ApplicationHelper
         log = Capacitylog.where(:user_id => user.id).where("created_at <= ?", start_date).order(:created_at).last
         users_last_number[user.id.to_s] = log.capacity_number if log.present?
 
-        logs.concat Capacitylog.where(:user_id => user.id).where("created_at >= ? AND created_at < ?", start_date, leaving_date.blank? || leaving_date >= end_date ? end_date : leaving_date)
+        logs.concat Capacitylog.where(:user_id => user.id).where("created_at >= ? AND created_at < ?", start_date, leaving_date.blank? || leaving_date >= end_date ? end_date + 1.days : leaving_date)
 
       end
 

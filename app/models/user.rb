@@ -110,7 +110,7 @@ class User < ApplicationRecord
   def capacity_ys(start_date, end_date)
     stg = ""
 
-    Capacitylog.where(:user_id => self.id).where("created_at >= ? AND created_at < ?", start_date, end_date).order(:created_at).each do |log|
+    Capacitylog.where(:user_id => self.id).where("created_at >= ? AND created_at < ?", start_date, end_date + 1.days).order(:created_at).each do |log|
 
       break if self.leaving_date.present? && self.leaving_date < log.created_at.to_datetime
       stg += ", " if stg != ""
@@ -124,7 +124,7 @@ class User < ApplicationRecord
 
   def capacity_xs(start_date, end_date)
     stg = ""
-    Capacitylog.where(:user_id => self.id).where("created_at >= ? AND created_at < ?", start_date, end_date).order(:created_at).each do |log|
+    Capacitylog.where(:user_id => self.id).where("created_at >= ? AND created_at < ?", start_date, end_date + 1.days).order(:created_at).each do |log|
       break if self.leaving_date.present? && self.leaving_date < log.created_at.to_datetime
       stg += ", " if stg != ""
       stg += ((log.created_at.to_datetime - start_date) / (end_date - start_date)).to_s
@@ -155,7 +155,7 @@ class User < ApplicationRecord
         total = 0
         date = first_log_date.to_datetime
 
-        Capacitylog.where(:user_id => self.id).where("created_at >= ? AND created_at < ?", start_date, end_date).order(:created_at).each do |log|
+        Capacitylog.where(:user_id => self.id).where("created_at >= ? AND created_at < ?", start_date, end_date + 1.days).order(:created_at).each do |log|
 
           break if self.leaving_date.present? && self.leaving_date < log.created_at.to_datetime
 
