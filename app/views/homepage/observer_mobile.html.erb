@@ -60,7 +60,10 @@
 
 <button id="send_email_button" onclick="send_email();" class="small_button" style="width: 200px; display: none">Send email to all selected users</button>
 
-<h2>Non absent users</h2>
+<div class="flex_row">
+  <h2 style="margin-top: 30px">Non absent users</h2>
+  <%= image_tag "at_work.png", style: "margin-left:10px", width: "60" %>
+</div>
 
 <% multi_groups_flag = logged_in_user_helper.multi_selected_groups %>
 
@@ -110,7 +113,10 @@
   <% end %>
 </table>
 <hr style="width:50%">
-<h2 style="margin-top: 30px">Absent users</h2>
+<div class="flex_row">
+  <h2 style="margin-top: 30px">Absent users</h2>
+  <%= image_tag "bucket_and_spade.png", style: "margin-left:10px", width: "60" %>
+</div>
 
 <table width="100%" >
   <col width="25%">
